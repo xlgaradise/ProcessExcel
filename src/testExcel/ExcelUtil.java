@@ -132,7 +132,7 @@ public class ExcelUtil {
 	/**
 	 * 检查文件是否为Excel文件
 	 * @param filePath 文件路径
-	 * @return 如果文件为Excel格式则返回true,否则抛出异常
+	 * @return 如果文件为Excel格式则返回true,否则false
 	 * @throws IllegalArgumentException 文件不存在或者格式不为Excel文件
 	 * @throws NullPointerException 文件路径为null
 	 * @throws SecurityException 文件拒绝访问
@@ -148,7 +148,7 @@ public class ExcelUtil {
 				String name = file.getName();
 				String ext = name.substring(name.lastIndexOf("."));
 				if(ext.equals("xls") || ext.equals("xlsx")) return true;
-				else throw new IllegalArgumentException("文件不是Excel格式");
+				else return false;
 			}
 		} catch (NullPointerException e) {
 			saveErrorMessage("isExcelFile", "["+filePath+"]filePath is null.");
