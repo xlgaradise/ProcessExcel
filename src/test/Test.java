@@ -8,6 +8,7 @@ import java.util.Map;
 
 
 
+
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.poi.ss.usermodel.Cell;
@@ -15,8 +16,9 @@ import org.apache.poi.ss.usermodel.Row;
 
 
 
-import excel.ExcelUtil;
-import excel.SheetReadBean;
+
+import excelUtil.ExcelUtil;
+import excelUtil.SheetReadUtil;
 
 public class Test {
 	private static Logger logger = Logger.getLogger(Test.class);
@@ -50,7 +52,7 @@ public class Test {
 	
 	public static void dateFormat(){
 		eu.readSheetByIndex(1);
-		SheetReadBean bean = eu.sheetList.get(0);
+		SheetReadUtil bean = eu.sheetList.get(0);
 		int startRowIndex = 0;
 		int length = 1;
 		
@@ -80,7 +82,7 @@ public class Test {
 	
 	public static void title(){
 		eu.readSheetByIndex(1);
-		SheetReadBean bean = eu.sheetList.get(0);
+		SheetReadUtil bean = eu.sheetList.get(0);
 		print(bean);
 		
 		System.out.println("Titles");
@@ -95,14 +97,14 @@ public class Test {
 	
 	public static void printAll(){
 		eu.readSheetByIndex(0);
-		SheetReadBean bean = eu.sheetList.get(0);
+		SheetReadUtil bean = eu.sheetList.get(0);
 		System.out.println("row size: "+bean.getAllRowList().size());
 		print(bean);
 	}
 	
 	public static void filter(){
 		eu.readSheetByIndex(0);
-		SheetReadBean bean = eu.sheetList.get(0);
+		SheetReadUtil bean = eu.sheetList.get(0);
 		System.out.println("row size: "+bean.getAllRowList().size());
 
 		bean.setTitles(bean.getRowAt(1), 0, 38);
@@ -131,7 +133,7 @@ public class Test {
 	
 	public static void printCol(){
 		eu.readSheetByIndex(0);
-		SheetReadBean bean = eu.sheetList.get(0);
+		SheetReadUtil bean = eu.sheetList.get(0);
 		
 		ArrayList<Cell> cells = bean.getOneColumnAllCells(1);
 		String str = "";
@@ -147,7 +149,7 @@ public class Test {
 		}
 	}
 	
-	public static void print(SheetReadBean bean){
+	public static void print(SheetReadUtil bean){
 		String str = "";
 		for(Row row:bean.getAllRowList()){
 			

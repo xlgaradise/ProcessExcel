@@ -1,4 +1,4 @@
-package excel;
+package excelUtil;
 /** 
  * @author HPC
  * 
@@ -17,7 +17,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.util.CellRangeAddress;
 
-public class SheetReadBean {
+public class SheetReadUtil {
 
 	/**
 	 * 日志工具
@@ -39,7 +39,7 @@ public class SheetReadBean {
 	 */
 	private HashMap<Integer, String> titles;
 
-	public SheetReadBean(Sheet sheet){
+	public SheetReadUtil(Sheet sheet){
 		this.sheet = sheet;
 		allRowList = new ArrayList<>();
 		titles = new HashMap<>();

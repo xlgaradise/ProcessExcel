@@ -1,4 +1,4 @@
-package excel;
+package excelUtil;
 /** 
  * @author HPC
  * 
@@ -44,7 +44,7 @@ public class ExcelUtil {
 	/**
 	 * 最近一次读取的sheet列表
 	 */
-	public ArrayList<SheetReadBean> sheetList = null; 
+	public ArrayList<SheetReadUtil> sheetList = null; 
 
 	
 	/**
@@ -172,7 +172,7 @@ public class ExcelUtil {
 	public void readSheetByName(String name) throws IllegalArgumentException{
 		Sheet sheet = workbook.getSheet(name);
 		if(sheet != null){
-			sheetList.add(new SheetReadBean(sheet));
+			sheetList.add(new SheetReadUtil(sheet));
 			readAllRows(sheetList.get(0));
 		}
 		else
@@ -188,7 +188,7 @@ public class ExcelUtil {
 	public void readSheetList(int startIndex,int length) throws IndexOutOfBoundsException{
 		try {
 			this.sheetList = changeSL2SBL(getSheetList(startIndex, length));
-			for(SheetReadBean bean : sheetList){
+			for(SheetReadUtil bean : sheetList){
 				readAllRows(bean);
 			}
 		} catch (IndexOutOfBoundsException e) {
@@ -201,9 +201,9 @@ public class ExcelUtil {
 	 */
 	public void readAllSheet(){
 		int sheetCount = workbook.getNumberOfSheets();
-        SheetReadBean sheetBean = null;
+        SheetReadUtil sheetBean = null;
         for(int i=0;i<sheetCount;i++){
-        	sheetBean = new SheetReadBean(workbook.getSheetAt(i));
+        	sheetBean = new SheetReadUtil(workbook.getSheetAt(i));
         	readAllRows(sheetBean);
         	sheetList.add(sheetBean);
         }
@@ -235,11 +235,11 @@ public class ExcelUtil {
 	 * @param sheetList
 	 * @return sheetBean列表
 	 */
-	private ArrayList<SheetReadBean> changeSL2SBL(ArrayList<Sheet> sheetList){
-		ArrayList<SheetReadBean> sheetBeans = new ArrayList<>();
-		SheetReadBean bean = null;
+	private ArrayList<SheetReadUtil> changeSL2SBL(ArrayList<Sheet> sheetList){
+		ArrayList<SheetReadUtil> sheetBeans = new ArrayList<>();
+		SheetReadUtil bean = null;
 		for(Sheet s:sheetList){
-			bean = new SheetReadBean(s);
+			bean = new SheetReadUtil(s);
 			sheetBeans.add(bean);
 		}
 		return sheetBeans;
@@ -249,7 +249,7 @@ public class ExcelUtil {
 	 * 读取SheetBean中所有的行
 	 * @param sheetBean 要读取的sheetBean
 	 */
-	private void readAllRows(SheetReadBean sheetBean){
+	private void readAllRows(SheetReadUtil sheetBean){
 		Sheet sheet = sheetBean.getSheet();
 		int rowsCount = sheet.getLastRowNum() + 1;
 		readRows(sheetBean, 0, rowsCount);
@@ -262,7 +262,7 @@ public class ExcelUtil {
 	 * @param length 读取长度
 	 * @throws IndexOutOfBoundsException 参数越界错误
 	 */
-	private void readRows(SheetReadBean sheetBean,int startIndex,int length) throws IndexOutOfBoundsException{
+	private void readRows(SheetReadUtil sheetBean,int startIndex,int length) throws IndexOutOfBoundsException{
 		Sheet sheet = sheetBean.getSheet();
 		int rowsCount = sheet.getLastRowNum() + 1;
 		try {
