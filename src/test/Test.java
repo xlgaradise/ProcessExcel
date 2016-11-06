@@ -36,7 +36,7 @@ public class Test {
 			//dateFormat();
 			//printAll();
 			//filter();
-			printCol();
+			//printCol();
 			
 			
 			
@@ -169,6 +169,8 @@ public class Test {
 		}
 	}
 	
-	
+	public void write(){
+		
+	}
 	
 }

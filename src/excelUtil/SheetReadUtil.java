@@ -39,6 +39,9 @@ public class SheetReadUtil {
 	 */
 	private HashMap<Integer, String> titles;
 
+	/**
+	 * @param sheet 将要操作的sheet实例
+	 */
 	public SheetReadUtil(Sheet sheet){
 		this.sheet = sheet;
 		allRowList = new ArrayList<>();
