@@ -1,0 +1,244 @@
+
+####################
+
+[ERROR] 2016-11-06 12:38:49 
+getCellValue()
+java.lang.IllegalStateException: Cannot get a BOOLEAN value from a NUMERIC formula cell
+	at org.apache.poi.hssf.usermodel.HSSFCell.typeMismatch(HSSFCell.java:655)
+	at org.apache.poi.hssf.usermodel.HSSFCell.checkFormulaCachedValueType(HSSFCell.java:660)
+	at org.apache.poi.hssf.usermodel.HSSFCell.getBooleanCellValue(HSSFCell.java:898)
+	at excel.SheetBean.getCellValue(SheetBean.java:311)
+	at test.Test.print(Test.java:81)
+	at test.Test.sheet2(Test.java:64)
+	at test.Test.main(Test.java:32)
+
+####################
+
+[ERROR] 2016-11-06 12:38:49 
+getCellValue()
+java.lang.IllegalStateException: Cannot get a BOOLEAN value from a NUMERIC formula cell
+	at org.apache.poi.hssf.usermodel.HSSFCell.typeMismatch(HSSFCell.java:655)
+	at org.apache.poi.hssf.usermodel.HSSFCell.checkFormulaCachedValueType(HSSFCell.java:660)
+	at org.apache.poi.hssf.usermodel.HSSFCell.getBooleanCellValue(HSSFCell.java:898)
+	at excel.SheetBean.getCellValue(SheetBean.java:311)
+	at test.Test.print(Test.java:81)
+	at test.Test.sheet2(Test.java:64)
+	at test.Test.main(Test.java:32)
+
+####################
+
+[ERROR] 2016-11-06 12:38:49 
+getCellValue()
+java.lang.IllegalStateException: Cannot get a BOOLEAN value from a NUMERIC formula cell
+	at org.apache.poi.hssf.usermodel.HSSFCell.typeMismatch(HSSFCell.java:655)
+	at org.apache.poi.hssf.usermodel.HSSFCell.checkFormulaCachedValueType(HSSFCell.java:660)
+	at org.apache.poi.hssf.usermodel.HSSFCell.getBooleanCellValue(HSSFCell.java:898)
+	at excel.SheetBean.getCellValue(SheetBean.java:311)
+	at test.Test.print(Test.java:81)
+	at test.Test.sheet2(Test.java:64)
+	at test.Test.main(Test.java:32)
+
+####################
+
+[ERROR] 2016-11-06 12:38:49 
+getCellValue()
+java.lang.IllegalStateException: Cannot get a BOOLEAN value from a NUMERIC formula cell
+	at org.apache.poi.hssf.usermodel.HSSFCell.typeMismatch(HSSFCell.java:655)
+	at org.apache.poi.hssf.usermodel.HSSFCell.checkFormulaCachedValueType(HSSFCell.java:660)
+	at org.apache.poi.hssf.usermodel.HSSFCell.getBooleanCellValue(HSSFCell.java:898)
+	at excel.SheetBean.getCellValue(SheetBean.java:311)
+	at test.Test.print(Test.java:81)
+	at test.Test.sheet2(Test.java:64)
+	at test.Test.main(Test.java:32)
+
+####################
+
+[ERROR] 2016-11-06 12:38:49 
+getCellValue()
+java.lang.IllegalStateException: Cannot get a BOOLEAN value from a NUMERIC formula cell
+	at org.apache.poi.hssf.usermodel.HSSFCell.typeMismatch(HSSFCell.java:655)
+	at org.apache.poi.hssf.usermodel.HSSFCell.checkFormulaCachedValueType(HSSFCell.java:660)
+	at org.apache.poi.hssf.usermodel.HSSFCell.getBooleanCellValue(HSSFCell.java:898)
+	at excel.SheetBean.getCellValue(SheetBean.java:311)
+	at test.Test.print(Test.java:81)
+	at test.Test.sheet2(Test.java:64)
+	at test.Test.main(Test.java:32)
+
+####################
+
+[ERROR] 2016-11-06 12:38:49 
+getCellValue()
+java.lang.IllegalStateException: Cannot get a BOOLEAN value from a NUMERIC formula cell
+	at org.apache.poi.hssf.usermodel.HSSFCell.typeMismatch(HSSFCell.java:655)
+	at org.apache.poi.hssf.usermodel.HSSFCell.checkFormulaCachedValueType(HSSFCell.java:660)
+	at org.apache.poi.hssf.usermodel.HSSFCell.getBooleanCellValue(HSSFCell.java:898)
+	at excel.SheetBean.getCellValue(SheetBean.java:311)
+	at test.Test.print(Test.java:81)
+	at test.Test.sheet2(Test.java:64)
+	at test.Test.main(Test.java:32)
+
+####################
+
+[ERROR] 2016-11-06 12:38:49 
+getCellValue()
+java.lang.IllegalStateException: Cannot get a BOOLEAN value from a NUMERIC formula cell
+	at org.apache.poi.hssf.usermodel.HSSFCell.typeMismatch(HSSFCell.java:655)
+	at org.apache.poi.hssf.usermodel.HSSFCell.checkFormulaCachedValueType(HSSFCell.java:660)
+	at org.apache.poi.hssf.usermodel.HSSFCell.getBooleanCellValue(HSSFCell.java:898)
+	at excel.SheetBean.getCellValue(SheetBean.java:311)
+	at test.Test.print(Test.java:81)
+	at test.Test.sheet2(Test.java:64)
+	at test.Test.main(Test.java:32)
+
+####################
+
+[ERROR] 2016-11-06 12:38:49 
+getCellValue()
+java.lang.IllegalStateException: Cannot get a BOOLEAN value from a NUMERIC formula cell
+	at org.apache.poi.hssf.usermodel.HSSFCell.typeMismatch(HSSFCell.java:655)
+	at org.apache.poi.hssf.usermodel.HSSFCell.checkFormulaCachedValueType(HSSFCell.java:660)
+	at org.apache.poi.hssf.usermodel.HSSFCell.getBooleanCellValue(HSSFCell.java:898)
+	at excel.SheetBean.getCellValue(SheetBean.java:311)
+	at test.Test.print(Test.java:81)
+	at test.Test.sheet2(Test.java:64)
+	at test.Test.main(Test.java:32)
+
+####################
+
+[ERROR] 2016-11-06 12:38:49 
+getCellValue()
+java.lang.IllegalStateException: Cannot get a BOOLEAN value from a NUMERIC formula cell
+	at org.apache.poi.hssf.usermodel.HSSFCell.typeMismatch(HSSFCell.java:655)
+	at org.apache.poi.hssf.usermodel.HSSFCell.checkFormulaCachedValueType(HSSFCell.java:660)
+	at org.apache.poi.hssf.usermodel.HSSFCell.getBooleanCellValue(HSSFCell.java:898)
+	at excel.SheetBean.getCellValue(SheetBean.java:311)
+	at test.Test.print(Test.java:81)
+	at test.Test.sheet2(Test.java:64)
+	at test.Test.main(Test.java:32)
+
+####################
+
+[ERROR] 2016-11-06 12:38:49 
+getCellValue()
+java.lang.IllegalStateException: Cannot get a BOOLEAN value from a NUMERIC formula cell
+	at org.apache.poi.hssf.usermodel.HSSFCell.typeMismatch(HSSFCell.java:655)
+	at org.apache.poi.hssf.usermodel.HSSFCell.checkFormulaCachedValueType(HSSFCell.java:660)
+	at org.apache.poi.hssf.usermodel.HSSFCell.getBooleanCellValue(HSSFCell.java:898)
+	at excel.SheetBean.getCellValue(SheetBean.java:311)
+	at test.Test.print(Test.java:81)
+	at test.Test.sheet2(Test.java:64)
+	at test.Test.main(Test.java:32)
+
+####################
+
+[ERROR] 2016-11-06 12:38:49 
+getCellValue()
+java.lang.IllegalStateException: Cannot get a BOOLEAN value from a NUMERIC formula cell
+	at org.apache.poi.hssf.usermodel.HSSFCell.typeMismatch(HSSFCell.java:655)
+	at org.apache.poi.hssf.usermodel.HSSFCell.checkFormulaCachedValueType(HSSFCell.java:660)
+	at org.apache.poi.hssf.usermodel.HSSFCell.getBooleanCellValue(HSSFCell.java:898)
+	at excel.SheetBean.getCellValue(SheetBean.java:311)
+	at test.Test.print(Test.java:81)
+	at test.Test.sheet2(Test.java:64)
+	at test.Test.main(Test.java:32)
+
+####################
+
+[ERROR] 2016-11-06 12:38:49 
+getCellValue()
+java.lang.IllegalStateException: Cannot get a BOOLEAN value from a NUMERIC formula cell
+	at org.apache.poi.hssf.usermodel.HSSFCell.typeMismatch(HSSFCell.java:655)
+	at org.apache.poi.hssf.usermodel.HSSFCell.checkFormulaCachedValueType(HSSFCell.java:660)
+	at org.apache.poi.hssf.usermodel.HSSFCell.getBooleanCellValue(HSSFCell.java:898)
+	at excel.SheetBean.getCellValue(SheetBean.java:311)
+	at test.Test.print(Test.java:81)
+	at test.Test.sheet2(Test.java:64)
+	at test.Test.main(Test.java:32)
+
+####################
+
+[ERROR] 2016-11-06 12:38:49 
+getCellValue()
+java.lang.IllegalStateException: Cannot get a BOOLEAN value from a NUMERIC formula cell
+	at org.apache.poi.hssf.usermodel.HSSFCell.typeMismatch(HSSFCell.java:655)
+	at org.apache.poi.hssf.usermodel.HSSFCell.checkFormulaCachedValueType(HSSFCell.java:660)
+	at org.apache.poi.hssf.usermodel.HSSFCell.getBooleanCellValue(HSSFCell.java:898)
+	at excel.SheetBean.getCellValue(SheetBean.java:311)
+	at test.Test.print(Test.java:81)
+	at test.Test.sheet2(Test.java:64)
+	at test.Test.main(Test.java:32)
+
+####################
+
+[ERROR] 2016-11-06 12:38:49 
+getCellValue()
+java.lang.IllegalStateException: Cannot get a BOOLEAN value from a NUMERIC formula cell
+	at org.apache.poi.hssf.usermodel.HSSFCell.typeMismatch(HSSFCell.java:655)
+	at org.apache.poi.hssf.usermodel.HSSFCell.checkFormulaCachedValueType(HSSFCell.java:660)
+	at org.apache.poi.hssf.usermodel.HSSFCell.getBooleanCellValue(HSSFCell.java:898)
+	at excel.SheetBean.getCellValue(SheetBean.java:311)
+	at test.Test.print(Test.java:81)
+	at test.Test.sheet2(Test.java:64)
+	at test.Test.main(Test.java:32)
+
+####################
+
+[ERROR] 2016-11-06 12:38:49 
+getCellValue()
+java.lang.IllegalStateException: Cannot get a BOOLEAN value from a NUMERIC formula cell
+	at org.apache.poi.hssf.usermodel.HSSFCell.typeMismatch(HSSFCell.java:655)
+	at org.apache.poi.hssf.usermodel.HSSFCell.checkFormulaCachedValueType(HSSFCell.java:660)
+	at org.apache.poi.hssf.usermodel.HSSFCell.getBooleanCellValue(HSSFCell.java:898)
+	at excel.SheetBean.getCellValue(SheetBean.java:311)
+	at test.Test.print(Test.java:81)
+	at test.Test.sheet2(Test.java:64)
+	at test.Test.main(Test.java:32)
+
+####################
+
+[ERROR] 2016-11-06 12:38:49 
+getCellValue()
+java.lang.IllegalStateException: Cannot get a BOOLEAN value from a NUMERIC formula cell
+	at org.apache.poi.hssf.usermodel.HSSFCell.typeMismatch(HSSFCell.java:655)
+	at org.apache.poi.hssf.usermodel.HSSFCell.checkFormulaCachedValueType(HSSFCell.java:660)
+	at org.apache.poi.hssf.usermodel.HSSFCell.getBooleanCellValue(HSSFCell.java:898)
+	at excel.SheetBean.getCellValue(SheetBean.java:311)
+	at test.Test.print(Test.java:81)
+	at test.Test.sheet2(Test.java:64)
+	at test.Test.main(Test.java:32)
+
+####################
+
+[ERROR] 2016-11-06 12:56:47 
+getCellValue()
+java.lang.IllegalStateException: Cannot get a BOOLEAN value from a NUMERIC formula cell
+	at org.apache.poi.hssf.usermodel.HSSFCell.typeMismatch(HSSFCell.java:655)
+	at org.apache.poi.hssf.usermodel.HSSFCell.checkFormulaCachedValueType(HSSFCell.java:660)
+	at org.apache.poi.hssf.usermodel.HSSFCell.getBooleanCellValue(HSSFCell.java:898)
+	at excel.SheetBean.getCellValue(SheetBean.java:311)
+	at test.Test.sheet3(Test.java:86)
+	at test.Test.main(Test.java:33)
+
+####################
+
+[ERROR] 2016-11-06 12:56:47 
+getCellValue()
+java.lang.IllegalStateException: Cannot get a BOOLEAN value from a NUMERIC formula cell
+	at org.apache.poi.hssf.usermodel.HSSFCell.typeMismatch(HSSFCell.java:655)
+	at org.apache.poi.hssf.usermodel.HSSFCell.checkFormulaCachedValueType(HSSFCell.java:660)
+	at org.apache.poi.hssf.usermodel.HSSFCell.getBooleanCellValue(HSSFCell.java:898)
+	at excel.SheetBean.getCellValue(SheetBean.java:311)
+	at test.Test.sheet3(Test.java:86)
+	at test.Test.main(Test.java:33)
+
+####################
+
+[ERROR] 2016-11-06 12:57:35 
+getCellValue()
+java.lang.IllegalStateException: Cannot get a BOOLEAN value from a NUMERIC formula cell
+	at org.apache.poi.hssf.usermodel.HSSFCell.typeMismatch(HSSFCell.java:655)
+	at org.apache.poi.hssf.usermodel.HSSFCell.checkFormulaCachedValueType(HSSFCell.java:660)
+	at org.apache.poi.hssf.usermodel.HSSFCell.getBooleanCellValue(HSSFCell.java:898)
+	at excel.SheetBean.getCellValue(SheetBean.java:311)
+	at test.Test.sheet3(Test.java:86)
+	at test.Test.main(Test.java:33)
