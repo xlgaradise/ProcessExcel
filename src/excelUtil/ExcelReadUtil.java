@@ -5,31 +5,24 @@ package excelUtil;
  */
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.*;
 
 
-public class ExcelUtil {
+public class ExcelReadUtil {
 
 	//%%%%%%%%-------字段部分 开始----------%%%%%%%%%
-	/**
-	 * Excel文件路径
-	 */
-	private String excelPath = "";
-	
-	/**
-	 * Excel文件
-	 */
-	private File excelFile;
-	
 	/**
 	 *文件后缀名(xls,xlsx) 
 	 */
 	private String extension = "";
+
+	/**
+	 * Excel文件
+	 */
+	private File excelFile;
 	
 	/**
 	 * 操作Excel的Workbook工具
@@ -44,43 +37,22 @@ public class ExcelUtil {
 	/**
 	 * 最近一次读取的sheet列表
 	 */
-	public ArrayList<SheetReadUtil> sheetList = null; 
-
-	
-	/**
-	 * 默认Excel内容的开始比较列位置为第一列（索引值为0）
-	 */
-	private int compareColumnPos = 0;
-
-	/**
-	 * 多文件合并时遇到名称重复时是否进行覆盖，
-	 * 默认为true
-	 */
-	private boolean isOverWrite = true;
-	
-	/**
-	 * 多文件合并时是否需要做内容比较(即相同的内容不重复出现),默认值为true
-	 * (仅当不覆写目标内容是有效，即isOverWrite=false时有效)
-	 */
-	private boolean isNeedCompare = true;
-	
-
-	
+	private ArrayList<Sheet> sheetList = null; 	
 	
 	//%%%%%%%%-------字段部分 结束----------%%%%%%%%%
 	
 
 	/**
-	 * @param excelPath  文件路径
+	 * 创建读Excel文件的工具
+	 * @param excelPath  Excel文件读取路径
 	 * @throws IllegalArgumentException 文件不存在或格式错误
 	 * @throws NullPointerException 文件路径为null
 	 * @throws SecurityException 文件拒绝访问
 	 */
-	public ExcelUtil(String excelPath) throws IllegalArgumentException,NullPointerException,
+	public ExcelReadUtil(String excelPath) throws IllegalArgumentException,NullPointerException,
 											SecurityException{
 		try {
 			if(isExcelFile(excelPath)){
-				this.excelPath = excelPath;
 				this.excelFile = new File(excelPath);
 				String name = this.excelFile.getName();
 				this.extension = name.substring(name.lastIndexOf("."));
@@ -97,23 +69,25 @@ public class ExcelUtil {
 		}catch (SecurityException e) {
 			throw e;
 		}catch (Exception e) {
-			logger.error("other exception in ExcelUtil()", e);
+			logger.error("other exception in ExcelReadUtil()", e);
 		}
 	}
 	
 	/**
-	 * 重新new一个新的对象并返回
+	 * 获取Excel文件格式(.xls或.xlsx)
 	 * @return
 	 */
-/*	public ExcelUtil returnNewInstance(){
-		try {
-			ExcelUtil instance = new  ExcelUtil(this.excelPath);
-			return instance;
-		} catch (Exception e) {
-			logger.error("",e);
-			return null;
-		}
-	}*/
+	public String getExtension() {
+		return extension;
+	}
+	
+	/**
+	 * 获取读取的sheet列表
+	 * @return sheet列表
+	 */
+	public ArrayList<Sheet> getSheetList() {
+		return sheetList;
+	}
 	
 	/**
 	 * 检查文件是否为Excel文件
@@ -146,8 +120,7 @@ public class ExcelUtil {
 	 * 读取第一个sheet
 	 */
 	public void readFirstSheet(){
-		this.sheetList = changeSL2SBL(getSheetList(0, 1));
-		readAllRows(sheetList.get(0));
+		this.sheetList = getSheetList(0, 1);
 	}
 	
 	/**
@@ -157,8 +130,7 @@ public class ExcelUtil {
 	 */
 	public void readSheetByIndex(int index) throws IndexOutOfBoundsException{
 		try {
-			this.sheetList = changeSL2SBL(getSheetList(index, 1));
-			readAllRows(sheetList.get(0));
+			this.sheetList = getSheetList(index, 1);
 		} catch (IndexOutOfBoundsException e) {
 			throw e;
 		}
@@ -172,8 +144,7 @@ public class ExcelUtil {
 	public void readSheetByName(String name) throws IllegalArgumentException{
 		Sheet sheet = workbook.getSheet(name);
 		if(sheet != null){
-			sheetList.add(new SheetReadUtil(sheet));
-			readAllRows(sheetList.get(0));
+			sheetList.add(sheet);
 		}
 		else
 			throw new IllegalArgumentException("无法获取指定名称的sheet");
@@ -187,10 +158,7 @@ public class ExcelUtil {
 	 */
 	public void readSheetList(int startIndex,int length) throws IndexOutOfBoundsException{
 		try {
-			this.sheetList = changeSL2SBL(getSheetList(startIndex, length));
-			for(SheetReadUtil bean : sheetList){
-				readAllRows(bean);
-			}
+			this.sheetList = getSheetList(startIndex, length);
 		} catch (IndexOutOfBoundsException e) {
 			throw e;
 		}
@@ -201,11 +169,10 @@ public class ExcelUtil {
 	 */
 	public void readAllSheet(){
 		int sheetCount = workbook.getNumberOfSheets();
-        SheetReadUtil sheetBean = null;
+        Sheet sheet = null;
         for(int i=0;i<sheetCount;i++){
-        	sheetBean = new SheetReadUtil(workbook.getSheetAt(i));
-        	readAllRows(sheetBean);
-        	sheetList.add(sheetBean);
+        	sheet = workbook.getSheetAt(i);
+        	sheetList.add(sheet);
         }
 	}
 	
@@ -216,7 +183,7 @@ public class ExcelUtil {
 	 * @return Sheet 列表
 	 * @throws IndexOutOfBoundsException 参数错误
 	 */
-	public ArrayList<Sheet> getSheetList(int startIndex,int length) throws IndexOutOfBoundsException{
+	private ArrayList<Sheet> getSheetList(int startIndex,int length) throws IndexOutOfBoundsException{
 		ArrayList<Sheet> sheetList = new ArrayList<>();
         int sheetCount = workbook.getNumberOfSheets();  //Sheet的数量  
         try {
@@ -229,57 +196,6 @@ public class ExcelUtil {
 			throw e;
 		}
 	}
-
-	/**
-	 * 将SheetList转换为SheetBeanList
-	 * @param sheetList
-	 * @return sheetBean列表
-	 */
-	private ArrayList<SheetReadUtil> changeSL2SBL(ArrayList<Sheet> sheetList){
-		ArrayList<SheetReadUtil> sheetBeans = new ArrayList<>();
-		SheetReadUtil bean = null;
-		for(Sheet s:sheetList){
-			bean = new SheetReadUtil(s);
-			sheetBeans.add(bean);
-		}
-		return sheetBeans;
-	}
-	
-	/**
-	 * 读取SheetBean中所有的行
-	 * @param sheetBean 要读取的sheetBean
-	 */
-	private void readAllRows(SheetReadUtil sheetBean){
-		Sheet sheet = sheetBean.getSheet();
-		int rowsCount = sheet.getLastRowNum() + 1;
-		readRows(sheetBean, 0, rowsCount);
-	}
-
-	/**
-	 * 读取sheetBean中指定的行
-	 * @param sheetBean 要读取的sheetBean
-	 * @param startIndex 开始的行下标
-	 * @param length 读取长度
-	 * @throws IndexOutOfBoundsException 参数越界错误
-	 */
-	private void readRows(SheetReadUtil sheetBean,int startIndex,int length) throws IndexOutOfBoundsException{
-		Sheet sheet = sheetBean.getSheet();
-		int rowsCount = sheet.getLastRowNum() + 1;
-		try {
-			int endIndex = isIndexOutOfBounds(rowsCount, startIndex, length);
-			for(int i = startIndex;i<=endIndex;i++){
-				if(endIndex == 0){//只读sheet的第一行
-					Row r = sheet.getRow(0);
-					if(r != null)
-						sheetBean.addRow(r);
-				}else{
-					sheetBean.addRow(sheet.getRow(i));
-				}
-			}
-		} catch (IndexOutOfBoundsException e) {
-			throw e;
-		}
-	}
 	
 	/**
 	 * 判断数据长度、起始下标和读取长度参数是否越界
@@ -287,9 +203,9 @@ public class ExcelUtil {
 	 * @param startIndex 起始下标不能小于零或大于最大值
 	 * @param length 读取的长度,不能小于0
 	 * @return 如果参数越界抛出异常,否则返回要读取的最后一个下标值(如果下标越界,则返回最大下标值)
-	 * @throws IndexOutOfBoundsException 
+	 * @throws IndexOutOfBoundsException 参数错误
 	 */
-	public static int isIndexOutOfBounds(int count,int startIndex,int length) throws IndexOutOfBoundsException{
+	private int isIndexOutOfBounds(int count,int startIndex,int length) throws IndexOutOfBoundsException{
 		if(count<1){
 			throw new IndexOutOfBoundsException("数据长度小于1");
 		}
@@ -305,6 +221,7 @@ public class ExcelUtil {
 			endIndex = count - 1;
         return endIndex;
 	}
+	
 	
 	
 

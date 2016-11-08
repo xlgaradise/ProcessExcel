@@ -181,3 +181,50 @@ java.lang.IllegalArgumentException: title值不存在
 	at excel.SheetBean.getRowListByArg(SheetBean.java:106)
 	at test.Test.test(Test.java:107)
 	at test.Test.main(Test.java:36)
+
+####################
+
+[ERROR] 2016-11-08 12:05:03 
+
+java.lang.IllegalArgumentException: This Style does not belong to the supplied Workbook. Are you trying to assign a style from one workbook to the cell of a differnt workbook?
+	at org.apache.poi.hssf.usermodel.HSSFCellStyle.verifyBelongsToWorkbook(HSSFCellStyle.java:1033)
+	at org.apache.poi.hssf.usermodel.HSSFCell.setCellStyle(HSSFCell.java:943)
+	at org.apache.poi.hssf.usermodel.HSSFCell.setCellStyle(HSSFCell.java:933)
+	at test.Test.write(Test.java:184)
+	at test.Test.main(Test.java:49)
+
+####################
+
+[ERROR] 2016-11-08 12:14:25 
+
+java.io.FileNotFoundException: C:\Users\Administrator\Desktop\测试.xls (另一个程序正在使用此文件，进程无法访问。)
+	at java.io.FileOutputStream.open(Native Method)
+	at java.io.FileOutputStream.<init>(Unknown Source)
+	at java.io.FileOutputStream.<init>(Unknown Source)
+	at excelUtil.ExcelWriteUtil.writeToExcel(ExcelWriteUtil.java:147)
+	at test.Test.write(Test.java:202)
+	at test.Test.main(Test.java:51)
+
+####################
+
+[ERROR] 2016-11-08 12:54:56 
+
+java.io.FileNotFoundException: C:\Users\Administrator\Desktop\测试2.xls (另一个程序正在使用此文件，进程无法访问。)
+	at java.io.FileOutputStream.open(Native Method)
+	at java.io.FileOutputStream.<init>(Unknown Source)
+	at java.io.FileOutputStream.<init>(Unknown Source)
+	at excelUtil.ExcelWriteUtil.writeToExcel(ExcelWriteUtil.java:147)
+	at test.Test.write(Test.java:205)
+	at test.Test.main(Test.java:51)
+
+####################
+
+[ERROR] 2016-11-08 12:57:02 
+
+java.io.FileNotFoundException: C:\Users\Administrator\Desktop\测试2.xls (另一个程序正在使用此文件，进程无法访问。)
+	at java.io.FileOutputStream.open(Native Method)
+	at java.io.FileOutputStream.<init>(Unknown Source)
+	at java.io.FileOutputStream.<init>(Unknown Source)
+	at excelUtil.ExcelWriteUtil.writeToExcel(ExcelWriteUtil.java:147)
+	at test.Test.write(Test.java:205)
+	at test.Test.main(Test.java:51)

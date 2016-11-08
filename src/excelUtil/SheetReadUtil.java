@@ -9,7 +9,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DateUtil;
@@ -19,10 +18,7 @@ import org.apache.poi.ss.util.CellRangeAddress;
 
 public class SheetReadUtil {
 
-	/**
-	 * 日志工具
-	 */
-	private static Logger logger = Logger.getLogger("excelLog");
+	//%%%%%%%%-------字段部分 开始----------%%%%%%%%%
 	
 	/**
 	 * 实例的sheet
@@ -38,9 +34,13 @@ public class SheetReadUtil {
 	 * 自选标题(Integer为标题的列下标,String为标题内容)
 	 */
 	private HashMap<Integer, String> titles;
+	
+	//%%%%%%%%-------字段部分 结束----------%%%%%%%%%
+	
 
 	/**
-	 * @param sheet 将要操作的sheet实例
+	 * 创建读sheet的工具
+	 * @param sheet 将要操作的sheet实例,从ExcelReadUtil获取
 	 */
 	public SheetReadUtil(Sheet sheet){
 		this.sheet = sheet;
@@ -48,20 +48,45 @@ public class SheetReadUtil {
 		titles = new HashMap<>();
 	}
 	
-	/**
-	 * 向allRowList里添加一行Row
-	 * @param row
-	 */
-	public void addRow(Row row){
-		allRowList.add(row);
-	}
 
 	/**
 	 * 获取实例的sheet
-	 * @return
+	 * @return 返回该SheetReadUtil操作的sheet
 	 */
 	public Sheet getSheet(){
 		return sheet;
+	}
+	
+	/**
+	 * 读取Sheet中所有的行
+	 */
+	public void readAllRows(){
+		int rowsCount = sheet.getLastRowNum() + 1;
+		readRows(0, rowsCount);
+	}
+
+	/**
+	 * 读取sheet中指定的行
+	 * @param startIndex 开始的行下标
+	 * @param length 读取长度
+	 * @throws IndexOutOfBoundsException 参数越界错误
+	 */
+	public void readRows(int startIndex,int length) throws IndexOutOfBoundsException{
+		int rowsCount = sheet.getLastRowNum() + 1;
+		try {
+			int endIndex = isIndexOutOfBounds(rowsCount, startIndex, length);
+			for(int i = startIndex;i<=endIndex;i++){
+				if(endIndex == 0){//只读sheet的第一行
+					Row r = sheet.getRow(0);
+					if(r != null)
+						this.allRowList.add(r);
+				}else{
+					this.allRowList.add(sheet.getRow(i));
+				}
+			}
+		} catch (IndexOutOfBoundsException e) {
+			throw e;
+		}
 	}
 	
 	/**
@@ -125,7 +150,7 @@ public class SheetReadUtil {
 													IndexOutOfBoundsException,IllegalArgumentException{
 		int count = allRowList.size();
 		try {
-			int endIndex = ExcelUtil.isIndexOutOfBounds(count, startRowIndex, length);
+			int endIndex = isIndexOutOfBounds(count, startRowIndex, length);
 			ArrayList<Row> rows = new ArrayList<>();
 			for(int i=startRowIndex;i<=endIndex;i++){
 				rows.add(allRowList.get(i));
@@ -141,7 +166,7 @@ public class SheetReadUtil {
 	/**
 	 * 获取指定Row的所有CellList
 	 * @param row 指定Row
-	 * @return
+	 * @return 返回cellList
 	 */
 	public ArrayList<Cell> getOneRowAllCells(Row row){
 		int count = row.getLastCellNum();
@@ -156,7 +181,7 @@ public class SheetReadUtil {
 	 * @param row 指定Row
 	 * @param startColumnIndex 起始的列下标值
 	 * @param length 所需长度值
-	 * @return
+	 * @return 返回cellList或者抛出错误
 	 * @throws IndexOutOfBoundsException 下标值越界
 	 */
 	public ArrayList<Cell> getOneRowCellList(Row row,int startColumnIndex,int length) throws IndexOutOfBoundsException{
@@ -166,7 +191,7 @@ public class SheetReadUtil {
 			return cellList;
 		}
 		try {
-			int endIndex = ExcelUtil.isIndexOutOfBounds(count, startColumnIndex, length);
+			int endIndex = isIndexOutOfBounds(count, startColumnIndex, length);
 			Cell c = null;
 			for(int i=startColumnIndex;i<=endIndex;i++){
 				c = row.getCell(i);
@@ -181,7 +206,7 @@ public class SheetReadUtil {
 	/**
 	 * 获取一列的所有Cells
 	 * @param columnIndex 指定的列下标值
-	 * @return 返回CellList
+	 * @return 返回cellList或者抛出错误
 	 * @throws IndexOutOfBoundsException 下标值越界
 	 */
 	public ArrayList<Cell> getOneColumnAllCells(int columnIndex) throws IndexOutOfBoundsException{
@@ -198,14 +223,14 @@ public class SheetReadUtil {
 	 * @param cloumnIndex 指定的列下标值
 	 * @param startRowIndex 开始的行下标值
 	 * @param length 所需长度
-	 * @return 
+	 * @return 返回cellList列表或者抛出错误
 	 * @throws IndexOutOfBoundsException 下标值越界
 	 */
 	public ArrayList<Cell> getOneColumnCellList(int cloumnIndex,int startRowIndex,int length) throws IndexOutOfBoundsException{
 		ArrayList<Cell> cellList = new ArrayList<>();
 		int count = allRowList.size();
 		try {
-			int endIndex = ExcelUtil.isIndexOutOfBounds(count, startRowIndex, length);
+			int endIndex = isIndexOutOfBounds(count, startRowIndex, length);
 			Cell cell = null;
 			Row row = null;
 			for(int i=startRowIndex;i<=endIndex;i++){
@@ -255,7 +280,7 @@ public class SheetReadUtil {
 	
 	/**
 	 * 获取标题列表
-	 * @return
+	 * @return 返回标题
 	 */
 	public HashMap<Integer, String> getTitles(){
 		return titles;
@@ -358,11 +383,49 @@ public class SheetReadUtil {
 				string = "";
 			}
 			return string.trim();
-		} catch (Exception e) {
-			logger.error("getCellValue()", e);
+		} catch (Exception e) {//未知错误
 			return "";
 		}
 	}
+	
+	/**
+	 * 获取合并单元格的值 
+	 * @param cell 指定单元格
+	 * @return 单元格的值
+	 * @throws IllegalArgumentException 参数cell为null,或者cell不是合并单元格
+	 */
+	public String getCellValueOfMergedRegion(Cell cell) throws IllegalArgumentException{  
+		try {
+			int result = isCellInMergedRegion(cell);
+			if (result == 2) { //单元格在合并区域内部
+				int sheetMergeCount = sheet.getNumMergedRegions();
+				int rowIndex = cell.getRowIndex();
+				int columnIndex = cell.getColumnIndex();
+				for (int i = 0; i < sheetMergeCount; i++) {
+					CellRangeAddress ca = sheet.getMergedRegion(i);
+					int firstColumn = ca.getFirstColumn();
+					int lastColumn = ca.getLastColumn();
+					int firstRow = ca.getFirstRow();
+					int lastRow = ca.getLastRow();
+					
+					if (rowIndex >= firstRow && rowIndex <= lastRow) {
+						if (columnIndex >= firstColumn && columnIndex <= lastColumn) { //确定区域位置
+							Row fRow = sheet.getRow(firstRow);
+							Cell fCell = fRow.getCell(firstColumn);
+							return getCellValue(fCell); //返回该区域的第一个单元格的值
+						}
+					}
+				}
+				return "";
+			}else if (result == 1) { //单元格为合并区域的第一个单元
+				return getCellValue(cell); //直接返回该单元格的值
+			}else{
+				throw new IllegalArgumentException("指定单元格不是合并单元格");
+			}   
+		} catch (IllegalArgumentException e) {
+			throw e;
+		}
+	}    
 	
 	/**  
 	* 判断sheet页中是否含有合并单元格   
@@ -376,71 +439,95 @@ public class SheetReadUtil {
 	/**
 	 * 判断指定的单元格是否是合并单元格  
 	 * @param cell 指定单元格
-	 * @return 如果是合并单元格返回true否则返回false
+	 * @return 1(单元格是合并区域的一个单元)、2(合并区域内部的单元)、-1(不是合并区域内的单元)
 	 * @throws IllegalArgumentException 参数为null
 	 */
-	public boolean isMergedRegion(Cell cell) throws IllegalArgumentException{
+	public int isCellInMergedRegion(Cell cell) throws IllegalArgumentException{
 		if (hasMerged()) {
 			if(cell == null){
 				throw new IllegalArgumentException("参数为null");
 			}
 			int sheetMergeCount = sheet.getNumMergedRegions();
 			int rowIndex = cell.getRowIndex();
-			int colIndex = cell.getColumnIndex();
+			int columnIndex = cell.getColumnIndex();
 			for (int i = 0; i < sheetMergeCount; i++) {
 				CellRangeAddress range = sheet.getMergedRegion(i);
 				int firstColumn = range.getFirstColumn();
 				int lastColumn = range.getLastColumn();
 				int firstRow = range.getFirstRow();
 				int lastRow = range.getLastRow();
-				if (rowIndex >= firstRow && rowIndex <= lastRow) {
-					if (colIndex >= firstColumn && colIndex <= lastColumn) {
-						return true;
+				if(rowIndex == firstRow && columnIndex == firstColumn){//单元格为是合并区域的第一个单元
+					return 1;
+				}else if (rowIndex >= firstRow && rowIndex <= lastRow) {//单元格在合并区域内部
+					if (columnIndex >= firstColumn && columnIndex <= lastColumn) {
+						return 2;
 					}
 				}
 			}
-			return false;
+			return -1;
 		}else{
-			return false;
+			return -1;
 		}
 	}
 	
+	
 	/**
-	 * 获取合并单元格的值 
-	 * @param cell 指定单元格
-	 * @return 单元格的值
-	 * @throws IllegalArgumentException Cell为null或者cell不是合并单元格
-	 * @throws IllegalStateException 未知错误(不应出现)
+	 * 判断指定的单元格是否是合并单元格  
+	 * @param rowIndex 单元格行下标
+	 * @param columnIndex 单元格列下标
+	 * @return 1(单元格是合并区域的一个单元)、2(合并区域内部的单元)、-1(不是合并区域内的单元)
+	 * @throws IndexOutOfBoundsException 参数小于零
 	 */
-	public String getCellValueOfMergedRegion(Cell cell) throws IllegalArgumentException,IllegalStateException{  
-		try {
-			if (isMergedRegion(cell)) {
-				int sheetMergeCount = sheet.getNumMergedRegions();
-				int rowIndex = cell.getRowIndex();
-				int columnIndex = cell.getColumnIndex();
-				for (int i = 0; i < sheetMergeCount; i++) {
-					CellRangeAddress ca = sheet.getMergedRegion(i);
-					int firstColumn = ca.getFirstColumn();
-					int lastColumn = ca.getLastColumn();
-					int firstRow = ca.getFirstRow();
-					int lastRow = ca.getLastRow();
-					
-					if (rowIndex >= firstRow && rowIndex <= lastRow) {
-						if (columnIndex >= firstColumn && columnIndex <= lastColumn) {
-							Row fRow = sheet.getRow(firstRow);
-							Cell fCell = fRow.getCell(firstColumn);
-							return getCellValue(fCell);
-						}
+	public int isCellInMergedRegion(int rowIndex,int columnIndex) throws IndexOutOfBoundsException{
+		if (hasMerged()) {
+			if(rowIndex <0 || columnIndex <0){
+				throw new IndexOutOfBoundsException("参数小于零");
+			}
+			int sheetMergeCount = sheet.getNumMergedRegions();
+			for (int i = 0; i < sheetMergeCount; i++) {
+				CellRangeAddress range = sheet.getMergedRegion(i);
+				int firstColumn = range.getFirstColumn();
+				int lastColumn = range.getLastColumn();
+				int firstRow = range.getFirstRow();
+				int lastRow = range.getLastRow();
+				if(rowIndex == firstRow && columnIndex == firstColumn){//单元格为是合并区域的第一个单元
+					return 1;
+				}else if (rowIndex >= firstRow && rowIndex <= lastRow) {//单元格在合并区域内部
+					if (columnIndex >= firstColumn && columnIndex <= lastColumn) {
+						return 2;
 					}
 				}
-				throw new IllegalStateException("未知错误");
 			}
-			else{
-				throw new IllegalArgumentException("指定单元格不是合并单元格");
-			}   
-		} catch (IllegalArgumentException e) {
-			throw e;
+			return -1;//单元格不在合并区域内
+		}else{
+			return -1;
 		}
-	}    
+	}	
+	
+	/**
+	 * 判断数据长度、起始下标和读取长度参数是否越界
+	 * @param count 数据总长度,不能小于1
+	 * @param startIndex 起始下标不能小于零或大于最大值
+	 * @param length 读取的长度,不能小于0
+	 * @return 如果参数越界抛出异常,否则返回要读取的最后一个下标值(如果下标越界,则返回最大下标值)
+	 * @throws IndexOutOfBoundsException 参数错误
+	 */
+	private int isIndexOutOfBounds(int count,int startIndex,int length) throws IndexOutOfBoundsException{
+		if(count<1){
+			throw new IndexOutOfBoundsException("数据长度小于1");
+		}
+		if(length<0){
+        	throw new IndexOutOfBoundsException("读取长度小于零");
+        }
+        if(startIndex > count -1 || startIndex < 0){
+        	throw new IndexOutOfBoundsException("开始下标大于最大的下标值或小于零");
+        }
+        //要读取的最后一个下标,如果下标越界，则读取至最后一个值
+        int endIndex = startIndex + length - 1;
+		if (endIndex >= count)
+			endIndex = count - 1;
+        return endIndex;
+	}
+	
 	
 }
