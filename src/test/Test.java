@@ -1,21 +1,12 @@
 package test;
-
-
+/**
+ *@auchor HPC
+ *
+ */
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
-
-
-
-
-
-
-
-
-
-
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -25,11 +16,6 @@ import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Row;
 
-
-
-
-
-
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.util.CellRangeAddress;
 
@@ -38,6 +24,9 @@ import excelUtil.ExcelWriteUtil;
 import excelUtil.SheetReadUtil;
 import excelUtil.SheetWriteUtil;
 
+/**
+ *²âÊÔÎÄ¼þ
+ */
 public class Test {
 	private static Logger logger = Logger.getLogger(Test.class);
 	static ExcelReadUtil excelReadUtil = null;
@@ -59,12 +48,8 @@ public class Test {
 			
 			System.out.println("ALL DONE");
 		} catch (Exception e) {
-			// 
 			logger.error("main()",e);
-		}
-		
-		
-		
+		}	
 	}
 	
 	public static void testTitle(){
@@ -227,10 +212,8 @@ public class Test {
 				}//row != null
 			}//end row for
 		} catch (Exception e) {
-			// TODO: handle exception
-
+			logger.error("", e);
 		}
-
 	}
-	
+
 }

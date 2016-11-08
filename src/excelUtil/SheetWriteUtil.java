@@ -1,5 +1,8 @@
 package excelUtil;
-
+/**
+ *@auchor HPC
+ *
+ */
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -11,9 +14,9 @@ import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 
+
 /**
- *@auchor HPC
- *
+ *写sheet表的工具
  */
 public class SheetWriteUtil {
 	

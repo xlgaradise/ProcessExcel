@@ -3,6 +3,7 @@ package excelUtil;
  * @author HPC
  * 
  */
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
@@ -11,6 +12,9 @@ import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.*;
 
 
+/**
+ * 读取Excel文件,仅可获取Excel文件下的各个sheet表
+ */
 public class ExcelReadUtil {
 
 	//%%%%%%%%-------字段部分 开始----------%%%%%%%%%

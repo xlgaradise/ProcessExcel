@@ -16,6 +16,9 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.util.CellRangeAddress;
 
+/**
+ *读sheet表的工具,可获取行、列、单元格等
+ */
 public class SheetReadUtil {
 
 	//%%%%%%%%-------字段部分 开始----------%%%%%%%%%

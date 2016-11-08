@@ -1,5 +1,8 @@
 package excelUtil;
-
+/**
+ *@auchor HPC
+ *
+ */
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -10,9 +13,9 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+
 /**
- *@auchor HPC
- *
+ *写Excel文件工具
  */
 public class ExcelWriteUtil {
 	
