@@ -6,9 +6,12 @@ package excelUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 
-import org.apache.log4j.Logger;
+import org.apache.poi.EncryptedDocumentException;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
 
 
@@ -34,11 +37,6 @@ public class ExcelReadUtil {
 	private Workbook workbook = null;
 	
 	/**
-	 * 日志输出对象
-	 */
-	private static Logger logger = Logger.getLogger("excelLog");
-	
-	/**
 	 * 最近一次读取的sheet列表
 	 */
 	private ArrayList<Sheet> sheetList = null; 	
@@ -52,9 +50,11 @@ public class ExcelReadUtil {
 	 * @throws IllegalArgumentException 文件不存在或格式错误
 	 * @throws NullPointerException 文件路径为null
 	 * @throws SecurityException 文件拒绝访问
+	 * @throws FileNotFoundException 文件读取出错
+	 * @author Exception 生成工作薄出错
 	 */
 	public ExcelReadUtil(String excelPath) throws IllegalArgumentException,NullPointerException,
-											SecurityException{
+						SecurityException,FileNotFoundException,Exception{
 		try {
 			if(isExcelFile(excelPath)){
 				this.excelFile = new File(excelPath);
@@ -72,8 +72,14 @@ public class ExcelReadUtil {
 			throw e;
 		}catch (SecurityException e) {
 			throw e;
-		}catch (Exception e) {
-			logger.error("other exception in ExcelReadUtil()", e);
+		} catch (FileNotFoundException e) {
+			throw e;
+		} catch (EncryptedDocumentException e) {
+			throw e;
+		} catch (InvalidFormatException e) {
+			throw e;
+		} catch (IOException e) {
+			throw e;
 		}
 	}
 	
