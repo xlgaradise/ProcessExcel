@@ -26,17 +26,17 @@ public class SheetReadUtil {
 	/**
 	 * 实例的sheet
 	 */
-	private Sheet sheet;
+	protected Sheet sheet;
 	
 	/**
 	 * 该sheet的所有行数据
 	 */
-	private ArrayList<Row> allRowList = null;
+	protected ArrayList<Row> allRowList = null;
 	
 	/**
 	 * 自选标题(Integer为标题的列下标,String为标题内容)
 	 */
-	private HashMap<Integer, String> titles;
+	protected HashMap<Integer, String> titles;
 	
 	//%%%%%%%%-------字段部分 结束----------%%%%%%%%%
 	
@@ -515,7 +515,7 @@ public class SheetReadUtil {
 	 * @return 如果参数越界抛出异常,否则返回要读取的最后一个下标值(如果下标越界,则返回最大下标值)
 	 * @throws IndexOutOfBoundsException 参数错误
 	 */
-	private int isIndexOutOfBounds(int count,int startIndex,int length) throws IndexOutOfBoundsException{
+	protected int isIndexOutOfBounds(int count,int startIndex,int length) throws IndexOutOfBoundsException{
 		if(count<1){
 			throw new IndexOutOfBoundsException("数据长度小于1");
 		}

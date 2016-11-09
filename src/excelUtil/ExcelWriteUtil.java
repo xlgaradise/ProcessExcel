@@ -23,22 +23,22 @@ public class ExcelWriteUtil {
 	/**
 	 * Excel文件输出目录路径
 	 */
-	private String directoryPath = "";
+	protected String directoryPath = "";
 	
 	/**
 	 * Excel文件名称
 	 */
-	private String fileName = "";
+	protected String fileName = "";
 	
 	/**
 	 *文件后缀名(.xls,.xlsx) ,默认为.xls
 	 */
-	private String extension = ".xls";
+	protected String extension = ".xls";
 	
 	/**
 	 * 操作Excel的Workbook工具
 	 */
-	private Workbook workbook = null;
+	protected Workbook workbook = null;
 	
 	//%%%%%%%%-------字段部分 结束----------%%%%%%%%%
 	

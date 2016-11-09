@@ -25,7 +25,7 @@ public class SheetWriteUtil {
 	/**
 	 * 实例的sheet
 	 */
-	private Sheet sheet;
+	protected Sheet sheet;
 	
 	/**
 	 * 该sheet的所有行数据
@@ -35,13 +35,13 @@ public class SheetWriteUtil {
 	/**
 	 * Excel工作薄
 	 */
-	private Workbook workbook = null;
+	protected Workbook workbook = null;
 	
 	//所有合并区域的极值下标
-	private int minRowIndexOfMergedRange = 0;
-	private int maxRowIndexOfMergedRange = 0;
-	private int minColumnIndexOfMergedRange = 0;
-	private int maxColumnIndexOfMergedRange = 0;
+	protected int minRowIndexOfMergedRange = 0;
+	protected int maxRowIndexOfMergedRange = 0;
+	protected int minColumnIndexOfMergedRange = 0;
+	protected int maxColumnIndexOfMergedRange = 0;
 	
 	//%%%%%%%%-------字段部分 结束----------%%%%%%%%%
 	
@@ -218,7 +218,7 @@ public class SheetWriteUtil {
 	 * @return 返回Cell,或者抛出异常
 	 * @throws IllegalArgumentException  columnIndex <0 或者 大于文件提供最大值
 	 */
-	private Cell getCell(int rowIndex,int columnIndex) throws IllegalArgumentException{
+	protected Cell getCell(int rowIndex,int columnIndex) throws IllegalArgumentException{
 		Row row = sheet.getRow(rowIndex);
 		if(row == null)
 			row = sheet.createRow(rowIndex);

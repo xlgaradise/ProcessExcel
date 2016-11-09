@@ -24,22 +24,22 @@ public class ExcelReadUtil {
 	/**
 	 *文件后缀名(xls,xlsx) 
 	 */
-	private String extension = "";
+	protected String extension = "";
 
 	/**
 	 * Excel文件
 	 */
-	private File excelFile;
+	protected File excelFile;
 	
 	/**
 	 * 操作Excel的Workbook工具
 	 */
-	private Workbook workbook = null;
+	protected Workbook workbook = null;
 	
 	/**
 	 * 最近一次读取的sheet列表
 	 */
-	private ArrayList<Sheet> sheetList = null; 	
+	protected ArrayList<Sheet> sheetList = null; 	
 	
 	//%%%%%%%%-------字段部分 结束----------%%%%%%%%%
 	
@@ -193,7 +193,7 @@ public class ExcelReadUtil {
 	 * @return Sheet 列表
 	 * @throws IndexOutOfBoundsException 参数错误
 	 */
-	private ArrayList<Sheet> getSheetList(int startIndex,int length) throws IndexOutOfBoundsException{
+	protected ArrayList<Sheet> getSheetList(int startIndex,int length) throws IndexOutOfBoundsException{
 		ArrayList<Sheet> sheetList = new ArrayList<>();
         int sheetCount = workbook.getNumberOfSheets();  //Sheet的数量  
         try {
@@ -215,7 +215,7 @@ public class ExcelReadUtil {
 	 * @return 如果参数越界抛出异常,否则返回要读取的最后一个下标值(如果下标越界,则返回最大下标值)
 	 * @throws IndexOutOfBoundsException 参数错误
 	 */
-	private int isIndexOutOfBounds(int count,int startIndex,int length) throws IndexOutOfBoundsException{
+	protected int isIndexOutOfBounds(int count,int startIndex,int length) throws IndexOutOfBoundsException{
 		if(count<1){
 			throw new IndexOutOfBoundsException("数据长度小于1");
 		}
