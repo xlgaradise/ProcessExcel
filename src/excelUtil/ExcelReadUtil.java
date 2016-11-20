@@ -11,8 +11,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.poi.EncryptedDocumentException;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 
 /**
@@ -25,6 +27,11 @@ public class ExcelReadUtil {
 	 *文件后缀名(xls,xlsx) 
 	 */
 	protected String extension = "";
+	
+	/**
+	 * 文件名
+	 */
+	protected String fileName = "";
 
 	/**
 	 * Excel文件
@@ -51,7 +58,7 @@ public class ExcelReadUtil {
 	 * @throws NullPointerException 文件路径为null
 	 * @throws SecurityException 文件拒绝访问
 	 * @throws FileNotFoundException 文件读取出错
-	 * @author Exception 生成工作薄出错
+	 * @throws Exception 生成工作薄出错
 	 */
 	public ExcelReadUtil(String excelPath) throws IllegalArgumentException,NullPointerException,
 						SecurityException,FileNotFoundException,Exception{
@@ -60,9 +67,16 @@ public class ExcelReadUtil {
 				this.excelFile = new File(excelPath);
 				String name = this.excelFile.getName();
 				this.extension = name.substring(name.lastIndexOf("."));
-				FileInputStream is = new FileInputStream(excelFile); 
+				this.fileName = name;
 				//这种方式 Excel 2003/2007/2010 都是可以处理的  
-		        this.workbook = WorkbookFactory.create(is) ;
+				if(extension.equals(".xls")){
+					FileInputStream is = new FileInputStream(excelFile); 
+					this.workbook = new HSSFWorkbook(is);
+					is.close();
+				}else{//.xlsx
+					this.workbook = new XSSFWorkbook(excelFile);
+				}
+		        //this.workbook = WorkbookFactory.create(is) ;
 			}else {
 				throw new IllegalArgumentException("文件不是Excel文件");
 			}
@@ -89,6 +103,10 @@ public class ExcelReadUtil {
 	 */
 	public String getExtension() {
 		return extension;
+	}
+	
+	public String getFileName(){
+		return fileName;
 	}
 	
 	/**
@@ -184,6 +202,18 @@ public class ExcelReadUtil {
         	sheet = workbook.getSheetAt(i);
         	sheetList.add(sheet);
         }
+	}
+	
+	/**
+	 * 关闭读取工具
+	 * @throws IOException
+	 */
+	public void close() throws IOException{
+		try {
+			this.workbook.close();
+		} catch (IOException e) {
+			throw e;
+		}
 	}
 	
 	/**

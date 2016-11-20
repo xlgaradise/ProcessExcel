@@ -72,11 +72,11 @@ public class Test {
 		excelReadUtil.readSheetByIndex(0);
 		SheetReadUtil bean = new SheetReadUtil(excelReadUtil.getSheetList().get(0));
 		bean.readAllRows();
-		System.out.println("row size: "+bean.getAllRowList().size());
+		System.out.println("row size: "+bean.getRowList().size());
 
-		bean.setTitles(bean.getRowAt(1), 0, 38);
+		bean.setTitles(2, 0, 38);
 		
-		ArrayList<Row> rows = bean.getRowListByArg(bean.getAllRowList(), "户口类型", "城镇户口");
+		ArrayList<Row> rows = bean.getRowListByArg(bean.getRowList(), "户口类型", "城镇户口");
 		ArrayList<Row> rows2 = bean.getRowListByArg(rows, "政治面貌", "中共党员");
 		
 		String str = "";
@@ -92,7 +92,7 @@ public class Test {
 					str += " [null] ";
 					continue;
 				}
-				str += " ["+bean.getCellValue(cell) + "] ";
+				str += " ["+SheetReadUtil.getCellValue(cell) + "] ";
 			}
 			System.out.println(str);
 		}
@@ -112,7 +112,7 @@ public class Test {
 				System.out.println(str);
 				continue;
 			}
-			str = "["+bean.getCellValue(c)+"]";
+			str = "["+SheetReadUtil.getCellValue(c)+"]";
 			System.out.println(str);
 		}
 	}
@@ -121,9 +121,9 @@ public class Test {
 		excelReadUtil.readSheetByIndex(sheetIndex);
 		SheetReadUtil bean = new SheetReadUtil(excelReadUtil.getSheetList().get(0));
 		bean.readAllRows();
-		System.out.println("row size: "+bean.getAllRowList().size());
+		System.out.println("row size: "+bean.getRowList().size());
 		String str = "";
-		for(Row row:bean.getAllRowList()){
+		for(Row row:bean.getRowList()){
 			
 			str = "";
 			if(row == null){
@@ -135,7 +135,7 @@ public class Test {
 					str += " [null] ";
 					continue;
 				}
-				str += " ["+bean.getCellValue(cell) + "] ";
+				str += " ["+SheetReadUtil.getCellValue(cell) + "] ";
 			}
 			System.out.println(str);
 		}
@@ -177,7 +177,7 @@ public class Test {
 				}
 			}
 
-			for (Row row : sRead.getAllRowList()) { // 添加单元格数据
+			for (Row row : sRead.getRowList()) { // 添加单元格数据
 				if (row == null) {
 					continue;
 				} else {
@@ -199,7 +199,7 @@ public class Test {
 								Font font = sWrite.getCommonFont_content();
 								style.setFont(font);
 								// style.setWrapText(true);
-								String value = sRead.getCellValue(cell);
+								String value = SheetReadUtil.getCellValue(cell);
 
 								sWrite.setAutoSizeColumn(cell.getColumnIndex());
 

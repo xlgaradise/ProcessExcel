@@ -9,12 +9,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.util.CellRangeAddress;
+
+import excelUtil.CellTypeUtil.TypeEnum;
 
 /**
  *读sheet表的工具,可获取行、列、单元格等
@@ -29,14 +31,16 @@ public class SheetReadUtil {
 	protected Sheet sheet;
 	
 	/**
-	 * 该sheet的所有行数据
+	 * 该sheet的指定行数据
 	 */
-	protected ArrayList<Row> allRowList = null;
+	protected ArrayList<Row> rowList = null;
 	
 	/**
 	 * 自选标题(Integer为标题的列下标,String为标题内容)
 	 */
 	protected HashMap<Integer, String> titles;
+	
+	
 	
 	//%%%%%%%%-------字段部分 结束----------%%%%%%%%%
 	
@@ -47,7 +51,7 @@ public class SheetReadUtil {
 	 */
 	public SheetReadUtil(Sheet sheet){
 		this.sheet = sheet;
-		allRowList = new ArrayList<>();
+		rowList = new ArrayList<>();
 		titles = new HashMap<>();
 	}
 	
@@ -64,6 +68,7 @@ public class SheetReadUtil {
 	 * 读取Sheet中所有的行
 	 */
 	public void readAllRows(){
+		rowList.clear();
 		int rowsCount = sheet.getLastRowNum() + 1;
 		readRows(0, rowsCount);
 	}
@@ -72,9 +77,10 @@ public class SheetReadUtil {
 	 * 读取sheet中指定的行
 	 * @param startIndex 开始的行下标
 	 * @param length 读取长度
-	 * @throws IndexOutOfBoundsException 参数越界错误
+	 * @throws IndexOutOfBoundsException 起始下标不能小于零或大于最大值，length读取的长度不能小于0
 	 */
 	public void readRows(int startIndex,int length) throws IndexOutOfBoundsException{
+		rowList.clear();
 		int rowsCount = sheet.getLastRowNum() + 1;
 		try {
 			int endIndex = isIndexOutOfBounds(rowsCount, startIndex, length);
@@ -82,9 +88,9 @@ public class SheetReadUtil {
 				if(endIndex == 0){//只读sheet的第一行
 					Row r = sheet.getRow(0);
 					if(r != null)
-						this.allRowList.add(r);
+						this.rowList.add(r);
 				}else{
-					this.allRowList.add(sheet.getRow(i));
+					this.rowList.add(sheet.getRow(i));
 				}
 			}
 		} catch (IndexOutOfBoundsException e) {
@@ -93,22 +99,22 @@ public class SheetReadUtil {
 	}
 	
 	/**
-	 * 返回allRowList列表
+	 * 返回rowList列表
 	 * @return
 	 */
-	public ArrayList<Row> getAllRowList() {
-		return allRowList;
+	public ArrayList<Row> getRowList() {
+		return rowList;
 	}
 	
 	/**
-	 * 获取allRowList列表里指定的Row
-	 * @param rowIndex Row下标值
+	 * 获取rowList列表里指定的Row
+	 * @param rowIndex Row下标值(在rowList中的下标而非在Excel中的行下标)
 	 * @return 返回指定Row,或者抛出异常
 	 * @throws IndexOutOfBoundsException 下标值越界异常 
 	 */
 	public Row getRowAt(int rowIndex) throws IndexOutOfBoundsException {
 		try {
-			return allRowList.get(rowIndex);
+			return rowList.get(rowIndex);
 		} catch (IndexOutOfBoundsException e) {
 			throw e;
 		}
@@ -146,17 +152,17 @@ public class SheetReadUtil {
 	 * @param title 标题名称
 	 * @param value 标题属性值
 	 * @return 返回指定RowList列表
-	 * @throws IndexOutOfBoundsException 下标值越界
+	 * @throws IndexOutOfBoundsException 起始下标不能小于零或大于最大值，length读取的长度不能小于0
 	 * @throws IllegalArgumentException 标题值不存在
 	 */
 	public ArrayList<Row> getRowListByArg(int startRowIndex,int length,String title,String value) throws
 													IndexOutOfBoundsException,IllegalArgumentException{
-		int count = allRowList.size();
+		int count = rowList.size();
 		try {
 			int endIndex = isIndexOutOfBounds(count, startRowIndex, length);
 			ArrayList<Row> rows = new ArrayList<>();
 			for(int i=startRowIndex;i<=endIndex;i++){
-				rows.add(allRowList.get(i));
+				rows.add(rowList.get(i));
 			}
 			return getRowListByArg(rows, title, value);
 		} catch (IndexOutOfBoundsException e) {
@@ -185,7 +191,7 @@ public class SheetReadUtil {
 	 * @param startColumnIndex 起始的列下标值
 	 * @param length 所需长度值
 	 * @return 返回cellList或者抛出错误
-	 * @throws IndexOutOfBoundsException 下标值越界
+	 * @throws IndexOutOfBoundsException 起始下标不能小于零或大于最大值，length读取的长度不能小于0
 	 */
 	public ArrayList<Cell> getOneRowCellList(Row row,int startColumnIndex,int length) throws IndexOutOfBoundsException{
 		ArrayList<Cell> cellList = new ArrayList<>();
@@ -214,7 +220,7 @@ public class SheetReadUtil {
 	 */
 	public ArrayList<Cell> getOneColumnAllCells(int columnIndex) throws IndexOutOfBoundsException{
 		try {
-			int length = allRowList.size();
+			int length = rowList.size();
 			return getOneColumnCellList(columnIndex, 0, length);
 		} catch (IndexOutOfBoundsException e) {
 			throw e;
@@ -227,17 +233,17 @@ public class SheetReadUtil {
 	 * @param startRowIndex 开始的行下标值
 	 * @param length 所需长度
 	 * @return 返回cellList列表或者抛出错误
-	 * @throws IndexOutOfBoundsException 下标值越界
+	 * @throws IndexOutOfBoundsException 起始下标不能小于零或大于最大值，length读取的长度不能小于0
 	 */
 	public ArrayList<Cell> getOneColumnCellList(int cloumnIndex,int startRowIndex,int length) throws IndexOutOfBoundsException{
 		ArrayList<Cell> cellList = new ArrayList<>();
-		int count = allRowList.size();
+		int count = rowList.size();
 		try {
 			int endIndex = isIndexOutOfBounds(count, startRowIndex, length);
 			Cell cell = null;
 			Row row = null;
 			for(int i=startRowIndex;i<=endIndex;i++){
-				row = allRowList.get(i);
+				row = rowList.get(i);
 				if(row == null){
 					cellList.add(null);
 				}else{
@@ -253,14 +259,17 @@ public class SheetReadUtil {
 	
 	/**
 	 * 设定sheet的标题列表
-	 * @param row 指定的行
+	 * @param rowIndex sheet中行下标
 	 * @param startColumnIndex 开始列下标值
 	 * @param length 所需长度
-	 * @throws IndexOutOfBoundsException 下标值越界
-	 * @throws IllegalArgumentException 指定行没有数据
+	 * @throws IndexOutOfBoundsException 起始下标不能小于零或大于最大值，length读取的长度不能小于0
+	 * @throws IllegalArgumentException 指定行为null,或没有数据
 	 */
-	public void setTitles(Row row,int startColumnIndex,int length) throws IndexOutOfBoundsException,
+	public void setTitles(int rowIndex,int startColumnIndex,int length) throws IndexOutOfBoundsException,
 																IllegalArgumentException{
+		Row row = sheet.getRow(rowIndex);
+		if(row == null)
+			throw new IllegalArgumentException("该行为null");
 		int cellCount = row.getLastCellNum();
 		if(cellCount == -1){
 			throw new IllegalArgumentException("该行没有数据");
@@ -306,68 +315,60 @@ public class SheetReadUtil {
 	 * 获取指定Cell的数据值
 	 * @param cell 指定Cell
 	 * @return 将所有数据以String类型返回
+	 * <br>日期类型格式(yyyy-MM-dd,yyyy-MM,MM-dd),单元格式为DATE_NUM时只返回(yyyy-MM-dd)
+	 * <br>cell为null,或没有值,或取值出错则返回""
 	 */
-	@SuppressWarnings("deprecation")
-	public String getCellValue(Cell cell){
+	public static String getCellValue(Cell cell){
 		if(cell == null){
 			return "";
 		}
 		String string = "";
 		try {
-			CellType cellType = cell.getCellTypeEnum();
+			TypeEnum cellType = CellTypeUtil.getCellType(cell);
 			
 			switch (cellType) {
 			case STRING:
 				string =  cell.getStringCellValue().trim();
 				break;
 			case NUMERIC:
-				short format = cell.getCellStyle().getDataFormat();
-				/**
-				 * 判断日期类型
-				 * (2001.01.01) cellType:STRING format：0
-				 * (yyyy-MM) cellType:NUM format:17 是日期格式
-				 * (yyyy年MM月dd日) cellType:NUM format:31
-				 * (yyyy年MM月) cellType:NUM format:57
-				 * (MM-dd或MM月dd日) cellType:NUM format:58
-				 * (yyyy-MM-dd) cellType:NUM format: 176 
-				 * 177? 数值与日期均存在
-				 * 179?
-				 * 178?
-				 */
-				if(DateUtil.isCellDateFormatted(cell)){ //处理日期格式
-					SimpleDateFormat s = new SimpleDateFormat("yyyy-MM-dd");
-					double d = cell.getNumericCellValue();
-					Date date = DateUtil.getJavaDate(d);
-					string = s.format(date);
-				}else if(format == 31 || format == 57 || format == 58 || format == 176){//自定义日期格式
-					SimpleDateFormat s = null;
-					switch (format) {
-					case 31:
-						s = new SimpleDateFormat("yyyy年MM月dd日");
-						break;
-					case 57:
-						s = new SimpleDateFormat("yyyy年MM月");
-						break;
-					case 58:
-						s = new SimpleDateFormat("MM月dd日");
-						break;
-					case 176:
-						s = new SimpleDateFormat("yyyy年MM月dd日");
-						break;
-					default:
-						break;
-					}
-					double d = cell.getNumericCellValue();
-					Date date = DateUtil.getJavaDate(d);
-					string = s.format(date);
-				}else{
-					double d = cell.getNumericCellValue();
-					int in = (int)d;
-					double last = d - in;
-					if(last == 0) //double为整数
-						string = String.valueOf(in);
-					else 
-						string = String.valueOf(d);
+				double dd = cell.getNumericCellValue();
+				int in = (int) dd;
+				double last = dd - in;
+				if (last == 0) // double为整数
+					string = String.valueOf(in);
+				else
+					string = String.valueOf(dd);
+				break;
+			case DATE_NUM:
+				double d = cell.getNumericCellValue();
+				Date date = DateUtil.getJavaDate(d);
+				string = new SimpleDateFormat("yyyy-MM-dd").format(date);
+				break;
+			case DATE_STR:
+				string =  cell.getStringCellValue().trim();
+				switch (CellTypeUtil.getDateEnum(string)) {
+				case yyyy_MM_dd_chinese:
+					string = string.replaceAll("[年月]{1}", "-");
+					string = string.replaceAll("[日号]?", "");
+					break;
+				case yyyy_MM_chinese:
+					string = string.replaceAll("[年月]{1}", "-");
+					break;
+				case MM_dd_chinese:
+					string = string.replaceAll("月{1}", "-");
+					string = string.replaceAll("[日号]?", "");
+					break;
+				case yyyy_MM_dd:
+					string = string.replaceAll("([/-]|\\.){1}", "-");
+					break;
+				case yyyy_MM:
+					string = string.replaceAll("[/-]{1}", "-");
+					break;
+				case MM_dd:
+					string = string.replaceAll("[/-]{1}", "-");
+					break;		
+				default:
+					break;
 				}
 				break;
 			case ERROR:
@@ -385,6 +386,18 @@ public class SheetReadUtil {
 			default:
 				string = "";
 			}
+			//去掉首尾全角空白符
+			while (string.startsWith("　")) {
+				string = string.substring(1, string.length()).trim();
+			}
+			while (string.endsWith("　")) {
+				string = string.substring(0, string.length() - 1).trim();
+			}
+			/*if (string != null) {//去掉换行、回车、制表符  
+		        Pattern p = Pattern.compile("\\s*|\t|\r|\n");  
+		        Matcher m = p.matcher(string);  
+		        string = m.replaceAll("");  
+		    }  */
 			return string.trim();
 		} catch (Exception e) {//未知错误
 			return "";
@@ -429,6 +442,18 @@ public class SheetReadUtil {
 			throw e;
 		}
 	}    
+	
+	/**
+	 * 强制将Numeric类型的值转换为日期
+	 * @param numeric numeric格式的单元格数值
+	 * @return yyyy-MM-dd格式的日期
+	 */
+	public static String changeNumericToDate(double numeric){
+		String string = "";
+		Date date = DateUtil.getJavaDate(numeric);
+		string = new SimpleDateFormat("yyyy-MM-dd").format(date);
+		return string;
+	}
 	
 	/**  
 	* 判断sheet页中是否含有合并单元格   
@@ -512,7 +537,8 @@ public class SheetReadUtil {
 	 * @param count 数据总长度,不能小于1
 	 * @param startIndex 起始下标不能小于零或大于最大值
 	 * @param length 读取的长度,不能小于0
-	 * @return 如果参数越界抛出异常,否则返回要读取的最后一个下标值(如果下标越界,则返回最大下标值)
+	 * @return 返回要读取的最后一个下标值(如果下标越界,则返回最大下标值)
+	 * <br>如果参数越界抛出异常
 	 * @throws IndexOutOfBoundsException 参数错误
 	 */
 	protected int isIndexOutOfBounds(int count,int startIndex,int length) throws IndexOutOfBoundsException{

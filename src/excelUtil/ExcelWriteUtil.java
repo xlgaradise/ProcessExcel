@@ -15,7 +15,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 
 /**
- *写Excel文件工具
+ *写Excel文件工具,仅可操作sheet
  */
 public class ExcelWriteUtil {
 	
@@ -49,7 +49,7 @@ public class ExcelWriteUtil {
 	 * @param fileName 文件名
 	 * @throws FileNotFoundException 文件路径无效或不是一个目录
 	 * @throws IllegalArgumentException 文件名为空
-	 * @throws NullPointerException excelPath参数为null
+	 * @throws NullPointerException directoryPath参数为null
 	 * @throws SecurityException 目录文件拒绝访问
 	 */
 	public ExcelWriteUtil(String directoryPath,String fileName) throws FileNotFoundException,
@@ -80,7 +80,7 @@ public class ExcelWriteUtil {
 	 * @param extension 文件格式(.xls .xlsx)
 	 * @throws FileNotFoundException 文件路径无效或不是一个目录
 	 * @throws IllegalArgumentException 文件名为空,或后缀名错误
-	 * @throws NullPointerException excelPath参数为null
+	 * @throws NullPointerException directoryPath参数为null
 	 * @throws SecurityException 目录文件拒绝访问
 	 */
 	public ExcelWriteUtil(String directoryPath,String fileName,String extension) throws FileNotFoundException,
@@ -146,7 +146,6 @@ public class ExcelWriteUtil {
 	public void writeToExcel() throws FileNotFoundException,SecurityException,IOException{
 		try {
 			String path = directoryPath+File.separator+fileName+extension;
-			System.out.println(path);
 			FileOutputStream outputStream = new FileOutputStream(path);
 			workbook.write(outputStream);
 			outputStream.flush();
@@ -160,4 +159,16 @@ public class ExcelWriteUtil {
 		}
 	}
 
+	/**
+	 * 关闭写入工具
+	 * @throws IOException
+	 */
+	public void close() throws IOException{
+		try {
+			this.workbook.close();
+		} catch (IOException e) {
+			throw e;
+		}
+	}
+	
 }

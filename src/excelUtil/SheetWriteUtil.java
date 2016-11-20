@@ -4,8 +4,14 @@ package excelUtil;
  *
  */
 
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.DataFormat;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Row;
@@ -13,6 +19,8 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
+
+import excelUtil.CellTypeUtil.TypeEnum;
 
 
 /**
@@ -30,7 +38,7 @@ public class SheetWriteUtil {
 	/**
 	 * 该sheet的所有行数据
 	 */
-	//private ArrayList<Row> allRowList = null;
+	//private ArrayList<Row> rowList = null;
 	
 	/**
 	 * Excel工作薄
@@ -61,13 +69,11 @@ public class SheetWriteUtil {
 		this.workbook = sheet.getWorkbook();
 	}
 	
-	/**
-	 * 设置某列自动调整列宽
-	 * @param columnIndex 要调整列宽的下标
-	 */
-	public void setAutoSizeColumn(int columnIndex){
-		sheet.autoSizeColumn(columnIndex);
+	
+	public Sheet getSheet(){
+		return this.sheet;
 	}
+
 	
 	/**
 	 * 返回通用单元格样式(水平跨列居中、垂直居中、自动换行)
@@ -149,7 +155,7 @@ public class SheetWriteUtil {
 	public Font getCommonFont_title(){
 		Font font = workbook.createFont();
 		font.setFontName("黑体");
-		font.setFontHeightInPoints((short)12);
+		font.setFontHeightInPoints((short)10);
 		font.setBold(true);
 		return font;
 	}
@@ -177,6 +183,18 @@ public class SheetWriteUtil {
 			if(endColumnIndex > maxColumnIndexOfMergedRange)
 				maxColumnIndexOfMergedRange = endColumnIndex;
 		}
+	}
+	
+	/**
+	 * 获取有效行
+	 * @param rowIndex 行下标
+	 * @return Row实例
+	 */
+	public Row getValidRow(int rowIndex){
+		Row row = sheet.getRow(rowIndex);
+		if(row == null)
+			row = sheet.createRow(rowIndex);
+		return row;
 	}
 	
 	/**
@@ -209,6 +227,111 @@ public class SheetWriteUtil {
 			throw e;
 		}
 		
+	}
+	
+	/**
+	 * 将数据添加至单元格中
+	 * @param cell 单元格(若为null，则不执行该方法)
+	 * @param value 数据值 (日期值必须符合(yyyy-MM-dd,yyyy-MM,MM-dd))
+	 * @param cellType 单元格所属类型
+	 * @param cellStyle 单元格样式(可为null，若cellType为日期格式则需传递新的cellStyle实例)
+	 * @throws (-----详细信息保存在message里-------)
+	 * @throws IllegalArgumentException  数据值格式错误
+	 */
+	public void addValueToCell(Cell cell,String value,
+			TypeEnum cellType,CellStyle cellStyle) throws IllegalArgumentException{
+		
+		if(cell == null){
+			return;
+		}
+		if(cellStyle == null){
+			cellStyle = getCommonCellStyle_alignCenter();
+		}
+		switch (cellType) {
+		case STRING:
+			cell.setCellStyle(cellStyle);
+			cell.setCellValue(value);
+			break;
+		case NUMERIC:
+			double dd = 0;
+			try{
+				dd = Double.parseDouble(value);
+			}catch (NullPointerException e) {
+				throw new IllegalArgumentException("numeric value can't parse to double");
+			}catch (NumberFormatException e) {
+				throw new IllegalArgumentException("numeric value can't parse to double");
+			}
+			int in = (int) dd;
+			double last = dd - in;
+			cell.setCellStyle(cellStyle);
+			if (last == 0) // double为整数
+				cell.setCellValue(in);
+			else
+				cell.setCellValue(dd);
+			break;
+		case DATE_NUM:
+			DataFormat	dataFormat_num = sheet.getWorkbook().createDataFormat();
+			cellStyle.setDataFormat(dataFormat_num.getFormat("yyyy-MM-dd"));
+			Date dateNum = null;
+			try {
+				dateNum = new SimpleDateFormat("yyyy-MM-dd").parse(value);
+			} catch (ParseException e) {
+				throw new IllegalArgumentException("Date value is not dateFormat");
+			}
+			cell.setCellStyle(cellStyle);
+			cell.setCellValue(dateNum);
+			break;
+		case DATE_STR:
+			DataFormat dataFormat = sheet.getWorkbook().createDataFormat();
+			short formatNum = 0;
+			SimpleDateFormat simpleDateFormat = null;
+			Date dateStr = null;
+			//Value格式为((yyyy-MM-dd,yyyy-MM,MM-dd))
+			int length = value.length();
+			if(length == 10){
+				simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+			 	formatNum = dataFormat.getFormat("yyyy-MM-dd");
+			}else if (length == 7) {
+				simpleDateFormat = new SimpleDateFormat("yyyy-MM");
+				formatNum = dataFormat.getFormat("yyyy-MM");
+			}else {
+				simpleDateFormat = new SimpleDateFormat("MM-dd");
+				formatNum = dataFormat.getFormat("MM-dd");
+			}
+			try {
+				dateStr = simpleDateFormat.parse(value);
+			} catch (ParseException e) {
+				throw new IllegalArgumentException("Date value is not dateFormat");
+			}
+			cellStyle.setDataFormat(formatNum);
+			cell.setCellStyle(cellStyle);
+			cell.setCellValue(dateStr);
+			break;
+		case ERROR:
+			cell.setCellStyle(cellStyle);
+			cell.setCellErrorValue(Byte.parseByte(value));
+			break;
+		case FORMULA:
+			cell.setCellStyle(cellStyle);
+			cell.setCellFormula(value);
+			break;
+		case BOOLEAN:
+			cell.setCellStyle(cellStyle);
+			cell.setCellValue(Boolean.parseBoolean(value));
+			break;
+		case BLANK:
+		default:
+			cell.setCellStyle(cellStyle);
+			cell.setCellValue("");
+		}
+	}
+	
+	/**
+	 * 设置某列自动调整列宽
+	 * @param columnIndex 要调整列宽的下标
+	 */
+	public void setAutoSizeColumn(int columnIndex){
+		sheet.autoSizeColumn(columnIndex);
 	}
 	
 	/**
