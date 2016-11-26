@@ -112,6 +112,10 @@ public class ExcelWriteUtil {
 		}
 	}
 	
+	public Workbook getWorkBook(){
+		return workbook;
+	}
+	
 	/**
 	 * 创建新的sheet
 	 * @return sheet实例

@@ -12,7 +12,6 @@ import java.util.ArrayList;
 
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -32,6 +31,8 @@ public class ExcelReadUtil {
 	 * 文件名
 	 */
 	protected String fileName = "";
+	
+	protected String filePath ="";
 
 	/**
 	 * Excel文件
@@ -65,6 +66,7 @@ public class ExcelReadUtil {
 		try {
 			if(isExcelFile(excelPath)){
 				this.excelFile = new File(excelPath);
+				this.filePath = excelPath;
 				String name = this.excelFile.getName();
 				this.extension = name.substring(name.lastIndexOf("."));
 				this.fileName = name;
@@ -74,7 +76,9 @@ public class ExcelReadUtil {
 					this.workbook = new HSSFWorkbook(is);
 					is.close();
 				}else{//.xlsx
-					this.workbook = new XSSFWorkbook(excelFile);
+					FileInputStream is = new FileInputStream(excelFile); 
+					this.workbook = new XSSFWorkbook(is);
+					is.close();
 				}
 		        //this.workbook = WorkbookFactory.create(is) ;
 			}else {
@@ -89,8 +93,6 @@ public class ExcelReadUtil {
 		} catch (FileNotFoundException e) {
 			throw e;
 		} catch (EncryptedDocumentException e) {
-			throw e;
-		} catch (InvalidFormatException e) {
 			throw e;
 		} catch (IOException e) {
 			throw e;
@@ -107,6 +109,14 @@ public class ExcelReadUtil {
 	
 	public String getFileName(){
 		return fileName;
+	}
+	
+	public String getFilePath(){
+		return filePath;
+	}
+	
+	public Workbook getWorkBook(){
+		return workbook;
 	}
 	
 	/**

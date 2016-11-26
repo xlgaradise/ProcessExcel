@@ -12,11 +12,8 @@ import java.util.Date;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.DataFormat;
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 
@@ -75,90 +72,7 @@ public class SheetWriteUtil {
 	}
 
 	
-	/**
-	 * 返回通用单元格样式(水平跨列居中、垂直居中、自动换行)
-	 * @return
-	 */
-	public CellStyle getCommonCellStyle_alignCenter(){
-		CellStyle cellStyle = workbook.createCellStyle();
-		cellStyle.setAlignment(HorizontalAlignment.CENTER_SELECTION); //水平跨列居中
-		cellStyle.setVerticalAlignment(VerticalAlignment.CENTER); //垂直居中
-		cellStyle.setWrapText(true);//自动换行
-		return cellStyle;
-	}
 	
-	/**
-	 * 返回通用单元格样式(水平靠左、垂直居中、自动换行)
-	 * @return
-	 */
-	public CellStyle getCommonCellStyle_alignLeft(){
-		CellStyle cellStyle = workbook.createCellStyle();
-		cellStyle.setAlignment(HorizontalAlignment.LEFT); //水平靠左
-		cellStyle.setVerticalAlignment(VerticalAlignment.CENTER); //垂直居中
-		cellStyle.setWrapText(true);//自动换行
-		return cellStyle;
-	}
-	
-	/**
-	 * 返回通用单元格样式(水平靠右、垂直居中、自动换行)
-	 * @return
-	 */
-	public CellStyle getCommonCellStyle_alignRight(){
-		CellStyle cellStyle = workbook.createCellStyle();
-		cellStyle.setAlignment(HorizontalAlignment.RIGHT); //水平靠右
-		cellStyle.setVerticalAlignment(VerticalAlignment.CENTER); //垂直居中
-		cellStyle.setWrapText(true);//自动换行
-		return cellStyle;
-	}
-	
-	/**
-	 * 返回通用内容字体样式(宋体、大小10、不加粗)
-	 * @return
-	 */
-	public Font getCommonFont_content(){
-		Font font = workbook.createFont();
-		font.setFontName("宋体");
-		font.setFontHeightInPoints((short)10);
-		font.setBold(false);
-		return font;
-	}
-	
-	/**
-	 * 返回通用内容字体样式(宋体、大小10、加粗)
-	 * @return
-	 */
-	public Font getCommonFont_content_bold(){
-		Font font = workbook.createFont();
-		font.setFontName("宋体");
-		font.setFontHeightInPoints((short)10);
-		font.setBold(true);
-		return font;
-	}
-	
-	/**
-	 * 返回通用内容字体样式(宋体、大小10、不加粗、红色)
-	 * @return
-	 */
-	public Font getCommonFont_content_red(){
-		Font font = workbook.createFont();
-		font.setFontName("宋体");
-		font.setFontHeightInPoints((short)10);
-		font.setBold(true);
-		font.setColor(Font.COLOR_RED);
-		return font;
-	}
-	
-	/**
-	 * 返回通用标题字体样式(黑体、大小12、加粗)
-	 * @return
-	 */
-	public Font getCommonFont_title(){
-		Font font = workbook.createFont();
-		font.setFontName("黑体");
-		font.setFontHeightInPoints((short)10);
-		font.setBold(true);
-		return font;
-	}
 	
 	/**
 	 * 添加合并单元格
@@ -245,7 +159,8 @@ public class SheetWriteUtil {
 			return;
 		}
 		if(cellStyle == null){
-			cellStyle = getCommonCellStyle_alignCenter();
+			CellStyleUtil cellStyleUtil = new CellStyleUtil(workbook);
+			cellStyle = cellStyleUtil.getCommonCellStyle_alignCenter();
 		}
 		switch (cellType) {
 		case STRING:

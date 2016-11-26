@@ -127,9 +127,16 @@ public class SheetReadUtil {
 	 * @param value 标题属性值
 	 * @return 返回指定RowList列表
 	 * @throws IllegalArgumentException 标题值不存在
+	 * @throws IllegalStateException 未设置标题
 	 */
-	public ArrayList<Row> getRowListByArg(ArrayList<Row> rows,String title,String value) throws IllegalArgumentException{
-		int columnIndex = getTitleColIndexByValue(title);
+	public ArrayList<Row> getRowListByArg(ArrayList<Row> rows,String title,String value) 
+			throws IllegalArgumentException,IllegalStateException{
+		int columnIndex = -1;
+		try {
+			columnIndex = getTitleColIndexByValue(title);
+		} catch (IllegalStateException e) {
+			throw e;
+		}
 		ArrayList<Row> rowList = null;
 		if(columnIndex != -1){//title值存在
 			rowList = new ArrayList<>();
@@ -154,20 +161,25 @@ public class SheetReadUtil {
 	 * @return 返回指定RowList列表
 	 * @throws IndexOutOfBoundsException 起始下标不能小于零或大于最大值，length读取的长度不能小于0
 	 * @throws IllegalArgumentException 标题值不存在
+	 * @throws IllegalStateException 未设置标题
 	 */
 	public ArrayList<Row> getRowListByArg(int startRowIndex,int length,String title,String value) throws
-													IndexOutOfBoundsException,IllegalArgumentException{
+				IndexOutOfBoundsException,IllegalArgumentException,IllegalStateException{
 		int count = rowList.size();
+		ArrayList<Row> returnList = new ArrayList<>();
 		try {
 			int endIndex = isIndexOutOfBounds(count, startRowIndex, length);
 			ArrayList<Row> rows = new ArrayList<>();
 			for(int i=startRowIndex;i<=endIndex;i++){
 				rows.add(rowList.get(i));
 			}
-			return getRowListByArg(rows, title, value);
+			returnList = getRowListByArg(rows, title, value);
+			return returnList;
 		} catch (IndexOutOfBoundsException e) {
 			throw e;
 		}catch (IllegalArgumentException e) {
+			throw e;
+		}catch (IllegalStateException e) {
 			throw e;
 		}
 	}
@@ -274,6 +286,7 @@ public class SheetReadUtil {
 		if(cellCount == -1){
 			throw new IllegalArgumentException("该行没有数据");
 		}
+		titles.clear();
 		try {
 			ArrayList<Cell> cells = getOneRowCellList(row, startColumnIndex, length);
 			Cell cell = null;
@@ -302,8 +315,12 @@ public class SheetReadUtil {
 	 * 通过标题值获取所在列下标
 	 * @param titleName 指定标题值
 	 * @return 标题列下标,不存在则返回-1
+	 * @throws IllegalStateException 未设置标题
 	 */
-	public int getTitleColIndexByValue(String titleName){
+	public int getTitleColIndexByValue(String titleName) throws IllegalStateException{
+		if(titles.isEmpty()){
+			throw new IllegalStateException();
+		}
 		for(Map.Entry<Integer, String> entry : titles.entrySet()){
 			if(entry.getValue().equals(titleName)) 
 				return entry.getKey();
