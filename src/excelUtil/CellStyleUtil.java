@@ -25,7 +25,15 @@ public class CellStyleUtil {
 
 	
 	
-	public CellStyleUtil(Workbook workbook){
+	/**
+	 * 创建单元格样式工具
+	 * @param workbook
+	 * @throws IllegalArgumentException workbook为null
+	 */
+	public CellStyleUtil(Workbook workbook) throws IllegalArgumentException{
+		if(workbook == null){
+			throw new IllegalArgumentException();
+		}
 		this.workbook = workbook;
 	}
 	

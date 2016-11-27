@@ -61,7 +61,7 @@ public class SheetWriteUtil {
 	 */
 	public SheetWriteUtil(Sheet sheet) throws IllegalArgumentException{
 		if(sheet == null)
-			throw new IllegalArgumentException("sheetΪnull");
+			throw new IllegalArgumentException();
 		this.sheet = sheet;
 		this.workbook = sheet.getWorkbook();
 	}

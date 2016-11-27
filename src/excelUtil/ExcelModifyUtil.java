@@ -32,8 +32,12 @@ public class ExcelModifyUtil {
 	/**
 	 * 创建Excel文件修改工具
 	 * @param excelReadUtil
+	 * @throws IllegalArgumentException 参数为null
 	 */
-	public ExcelModifyUtil(ExcelReadUtil excelReadUtil){
+	public ExcelModifyUtil(ExcelReadUtil excelReadUtil) throws IllegalArgumentException{
+		if(excelReadUtil == null){
+			throw new IllegalArgumentException();
+		}
 		this.workbook = excelReadUtil.getWorkBook();
 		this.path = excelReadUtil.getFilePath();
 	}

@@ -44,6 +44,8 @@ public class ExcelReadUtil {
 	 */
 	protected Workbook workbook = null;
 	
+	protected FormulaEvaluator evaluator = null;
+	
 	/**
 	 * 最近一次读取的sheet列表
 	 */
@@ -80,7 +82,7 @@ public class ExcelReadUtil {
 					this.workbook = new XSSFWorkbook(is);
 					is.close();
 				}
-		        //this.workbook = WorkbookFactory.create(is) ;
+		        evaluator = this.workbook.getCreationHelper().createFormulaEvaluator();
 			}else {
 				throw new IllegalArgumentException("文件不是Excel文件");
 			}
@@ -117,6 +119,10 @@ public class ExcelReadUtil {
 	
 	public Workbook getWorkBook(){
 		return workbook;
+	}
+	
+	public FormulaEvaluator getEvaluator(){
+		return evaluator;
 	}
 	
 	/**

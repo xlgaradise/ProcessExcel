@@ -11,7 +11,9 @@ import java.util.Map;
 
 
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellValue;
 import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.util.CellRangeAddress;
@@ -48,8 +50,12 @@ public class SheetReadUtil {
 	/**
 	 * 创建读sheet的工具
 	 * @param sheet 将要操作的sheet实例,从ExcelReadUtil获取
+	 * @throws IllegalArgumentException 参数为null
 	 */
-	public SheetReadUtil(Sheet sheet){
+	public SheetReadUtil(Sheet sheet) throws IllegalArgumentException{
+		if(sheet == null){
+			throw new IllegalArgumentException();
+		}
 		this.sheet = sheet;
 		rowList = new ArrayList<>();
 		titles = new HashMap<>();
@@ -141,6 +147,9 @@ public class SheetReadUtil {
 		if(columnIndex != -1){//title值存在
 			rowList = new ArrayList<>();
 			for(Row row : rows){
+				if(row == null){
+					continue;
+				}
 				String v = getCellValue(row.getCell(columnIndex));
 				if(v.equals(value)){
 					rowList.add(row);
@@ -188,8 +197,12 @@ public class SheetReadUtil {
 	 * 获取指定Row的所有CellList
 	 * @param row 指定Row
 	 * @return 返回cellList
+	 * @throws IllegalArgumentException 参数为null
 	 */
-	public ArrayList<Cell> getOneRowAllCells(Row row){
+	public ArrayList<Cell> getOneRowAllCells(Row row) throws IllegalArgumentException{
+		if(row == null){
+			throw new IllegalArgumentException();
+		}
 		int count = row.getLastCellNum();
 		if(count == -1){
 			return new ArrayList<Cell>();
@@ -204,8 +217,13 @@ public class SheetReadUtil {
 	 * @param length 所需长度值
 	 * @return 返回cellList或者抛出错误
 	 * @throws IndexOutOfBoundsException 起始下标不能小于零或大于最大值，length读取的长度不能小于0
+	 * @throws IllegalArgumentException 参数row为null
 	 */
-	public ArrayList<Cell> getOneRowCellList(Row row,int startColumnIndex,int length) throws IndexOutOfBoundsException{
+	public ArrayList<Cell> getOneRowCellList(Row row,int startColumnIndex,int length) throws 
+					IndexOutOfBoundsException,IllegalArgumentException{
+		if(row == null){
+			throw new IllegalArgumentException();
+		}
 		ArrayList<Cell> cellList = new ArrayList<>();
 		int count = row.getLastCellNum();
 		if(count == -1){
@@ -420,6 +438,119 @@ public class SheetReadUtil {
 			return "";
 		}
 	}
+	
+	/**
+	 * 获取指定Cell的数据值
+	 * @param cell 指定Cell
+	 * @return 将所有数据以String类型返回
+	 * <br>日期类型格式(yyyy-MM-dd,yyyy-MM,MM-dd),单元格式为DATE_NUM时只返回(yyyy-MM-dd)
+	 * <br>cell为null,或没有值,或取值出错则返回""
+	 */
+	public static String getCellValue(Cell cell,FormulaEvaluator evaluator){
+		if(cell == null){
+			return "";
+		}
+		String string = "";
+		try {
+			TypeEnum cellType = CellTypeUtil.getCellType(cell);
+			
+			switch (cellType) {
+			case STRING:
+				string =  cell.getStringCellValue().trim();
+				break;
+			case NUMERIC:
+				double dd = cell.getNumericCellValue();
+				int in = (int) dd;
+				double last = dd - in;
+				if (last == 0) // double为整数
+					string = String.valueOf(in);
+				else
+					string = String.valueOf(dd);
+				break;
+			case DATE_NUM:
+				double d = cell.getNumericCellValue();
+				Date date = DateUtil.getJavaDate(d);
+				string = new SimpleDateFormat("yyyy-MM-dd").format(date);
+				break;
+			case DATE_STR:
+				string =  cell.getStringCellValue().trim();
+				switch (CellTypeUtil.getDateEnum(string)) {
+				case yyyy_MM_dd_chinese:
+					string = string.replaceAll("[年月]{1}", "-");
+					string = string.replaceAll("[日号]?", "");
+					break;
+				case yyyy_MM_chinese:
+					string = string.replaceAll("[年月]{1}", "-");
+					break;
+				case MM_dd_chinese:
+					string = string.replaceAll("月{1}", "-");
+					string = string.replaceAll("[日号]?", "");
+					break;
+				case yyyy_MM_dd:
+					string = string.replaceAll("([/-]|\\.){1}", "-");
+					break;
+				case yyyy_MM:
+					string = string.replaceAll("[/-]{1}", "-");
+					break;
+				case MM_dd:
+					string = string.replaceAll("[/-]{1}", "-");
+					break;		
+				default:
+					break;
+				}
+				break;
+			case ERROR:
+				string = String.valueOf(cell.getErrorCellValue());
+				break;
+			case FORMULA:
+				if(evaluator == null){
+					string = cell.getCellFormula();
+				}else{
+					string = getFormulaValue(evaluator.evaluate(cell));
+				}
+				break;
+			case BOOLEAN:
+				string = String.valueOf(cell.getBooleanCellValue());
+				break;
+			case BLANK:
+				string = "";
+				break;
+			default:
+				string = "";
+			}
+			//去掉首尾全角空白符
+			while (string.startsWith("　")) {
+				string = string.substring(1, string.length()).trim();
+			}
+			while (string.endsWith("　")) {
+				string = string.substring(0, string.length() - 1).trim();
+			}
+			/*if (string != null) {//去掉换行、回车、制表符  
+		        Pattern p = Pattern.compile("\\s*|\t|\r|\n");  
+		        Matcher m = p.matcher(string);  
+		        string = m.replaceAll("");  
+		    }  */
+			return string.trim();
+		} catch (Exception e) {//未知错误
+			return "";
+		}
+	}
+	
+	private static String getFormulaValue(CellValue cell) {
+        String cellValue = "";
+        switch (cell.getCellTypeEnum()) {
+        case STRING:
+            cellValue = cell.getStringValue();
+            break;
+        case NUMERIC:
+            cellValue = String.valueOf(cell.getNumberValue());
+            break;
+        default:
+            break;
+        }
+        return cellValue;
+    }
+	
 	
 	/**
 	 * 获取合并单元格的值 
