@@ -113,20 +113,6 @@ public class SheetReadUtil {
 	}
 	
 	/**
-	 * 获取rowList列表里指定的Row
-	 * @param rowIndex Row下标值(在rowList中的下标而非在Excel中的行下标)
-	 * @return 返回指定Row,或者抛出异常
-	 * @throws IndexOutOfBoundsException 下标值越界异常 
-	 */
-	public Row getRowAt(int rowIndex) throws IndexOutOfBoundsException {
-		try {
-			return rowList.get(rowIndex);
-		} catch (IndexOutOfBoundsException e) {
-			throw e;
-		}
-	}
-	
-	/**
 	 * 通过指定标题属性值从数据集里获取指定的RowList列表
 	 * @param rows Row列表数据集
 	 * @param title 标题名称
