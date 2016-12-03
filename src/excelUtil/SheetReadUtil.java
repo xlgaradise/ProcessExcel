@@ -335,9 +335,10 @@ public class SheetReadUtil {
 	/**
 	 * 获取指定Cell的数据值
 	 * @param cell 指定Cell
-	 * @return 将所有数据以String类型返回
-	 * <br>日期类型格式(yyyy-MM-dd,yyyy-MM,MM-dd),单元格式为DATE_NUM时只返回(yyyy-MM-dd)
-	 * <br>cell为null,或没有值,或取值出错则返回""
+	 * @return 将所有数据以String类型返回;
+	 * <br>日期类型格式(yyyy-MM-dd,yyyy-MM,MM-dd),单元格式为DATE_NUM时只返回(yyyy-MM-dd);
+	 * <br>公式类型格式返回公式计算方法而不是值;
+	 * <br>cell为null,或没有值,或取值出错则返回""。
 	 */
 	public static String getCellValue(Cell cell){
 		if(cell == null){
@@ -428,9 +429,11 @@ public class SheetReadUtil {
 	/**
 	 * 获取指定Cell的数据值
 	 * @param cell 指定Cell
-	 * @return 将所有数据以String类型返回
-	 * <br>日期类型格式(yyyy-MM-dd,yyyy-MM,MM-dd),单元格式为DATE_NUM时只返回(yyyy-MM-dd)
-	 * <br>cell为null,或没有值,或取值出错则返回""
+	 * @param evaluator 用于读取公式值的FormulaEvaluator实例
+	 * @return 将所有数据以String类型返回;
+	 * <br>日期类型格式(yyyy-MM-dd,yyyy-MM,MM-dd),单元格式为DATE_NUM时只返回(yyyy-MM-dd);
+	 * <br>公式类型格式返回公式计算值(若evaluator为null则返回公式);
+	 * <br>cell为null,或没有值,或取值出错则返回""。
 	 */
 	public static String getCellValue(Cell cell,FormulaEvaluator evaluator){
 		if(cell == null){
@@ -441,53 +444,6 @@ public class SheetReadUtil {
 			TypeEnum cellType = CellTypeUtil.getCellType(cell);
 			
 			switch (cellType) {
-			case STRING:
-				string =  cell.getStringCellValue().trim();
-				break;
-			case NUMERIC:
-				double dd = cell.getNumericCellValue();
-				int in = (int) dd;
-				double last = dd - in;
-				if (last == 0) // double为整数
-					string = String.valueOf(in);
-				else
-					string = String.valueOf(dd);
-				break;
-			case DATE_NUM:
-				double d = cell.getNumericCellValue();
-				Date date = DateUtil.getJavaDate(d);
-				string = new SimpleDateFormat("yyyy-MM-dd").format(date);
-				break;
-			case DATE_STR:
-				string =  cell.getStringCellValue().trim();
-				switch (CellTypeUtil.getDateEnum(string)) {
-				case yyyy_MM_dd_chinese:
-					string = string.replaceAll("[年月]{1}", "-");
-					string = string.replaceAll("[日号]?", "");
-					break;
-				case yyyy_MM_chinese:
-					string = string.replaceAll("[年月]{1}", "-");
-					break;
-				case MM_dd_chinese:
-					string = string.replaceAll("月{1}", "-");
-					string = string.replaceAll("[日号]?", "");
-					break;
-				case yyyy_MM_dd:
-					string = string.replaceAll("([/-]|\\.){1}", "-");
-					break;
-				case yyyy_MM:
-					string = string.replaceAll("[/-]{1}", "-");
-					break;
-				case MM_dd:
-					string = string.replaceAll("[/-]{1}", "-");
-					break;		
-				default:
-					break;
-				}
-				break;
-			case ERROR:
-				string = String.valueOf(cell.getErrorCellValue());
-				break;
 			case FORMULA:
 				if(evaluator == null){
 					string = cell.getCellFormula();
@@ -495,14 +451,8 @@ public class SheetReadUtil {
 					string = getFormulaValue(evaluator.evaluate(cell));
 				}
 				break;
-			case BOOLEAN:
-				string = String.valueOf(cell.getBooleanCellValue());
-				break;
-			case BLANK:
-				string = "";
-				break;
 			default:
-				string = "";
+				string = getCellValue(cell);
 			}
 			//去掉首尾全角空白符
 			while (string.startsWith("　")) {
@@ -511,30 +461,31 @@ public class SheetReadUtil {
 			while (string.endsWith("　")) {
 				string = string.substring(0, string.length() - 1).trim();
 			}
-			/*if (string != null) {//去掉换行、回车、制表符  
-		        Pattern p = Pattern.compile("\\s*|\t|\r|\n");  
-		        Matcher m = p.matcher(string);  
-		        string = m.replaceAll("");  
-		    }  */
+			
 			return string.trim();
 		} catch (Exception e) {//未知错误
 			return "";
 		}
 	}
 	
-	private static String getFormulaValue(CellValue cell) {
-        String cellValue = "";
-        switch (cell.getCellTypeEnum()) {
+	/**
+	 * 按类型返回公式计算值
+	 * @param cellValue 
+	 * @return 数值或文本类型返回具体值，其他返回""。
+	 */
+	private static String getFormulaValue(CellValue cellValue) {
+        String value = "";
+        switch (cellValue.getCellTypeEnum()) {
         case STRING:
-            cellValue = cell.getStringValue();
+            value = cellValue.getStringValue();
             break;
         case NUMERIC:
-            cellValue = String.valueOf(cell.getNumberValue());
+            value = String.valueOf(cellValue.getNumberValue());
             break;
         default:
             break;
         }
-        return cellValue;
+        return value;
     }
 	
 	

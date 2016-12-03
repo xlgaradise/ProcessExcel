@@ -44,6 +44,9 @@ public class ExcelReadUtil {
 	 */
 	protected Workbook workbook = null;
 	
+	/**
+	 * 用于读取公式
+	 */
 	protected FormulaEvaluator evaluator = null;
 	
 	/**
