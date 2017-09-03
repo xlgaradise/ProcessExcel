@@ -4,12 +4,18 @@
 */
 package excelUtil;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DateUtil;
+
+import exception.ExcelIllegalArgumentException;
+import exception.ExcelNullParameterException;
 
 /**
  *获取单元格格式工具
@@ -110,12 +116,12 @@ public class CellTypeUtil {
 	 * 获取单元格的格式
 	 * @param cell 单元格实例
 	 * @return TypeEnum类型格式
-	 * @throws IllegalArgumentException 参数Cell为null
+	 * @throws ExcelNullParameterException 参数Cell为null
 	 */
 	@SuppressWarnings("deprecation")
-	public static TypeEnum getCellType(Cell cell) throws IllegalArgumentException{
+	public static TypeEnum getCellType(Cell cell) throws ExcelNullParameterException{
 		if(cell == null){
-			throw new IllegalArgumentException();
+			throw new ExcelNullParameterException();
 		}
 
 		CellType cellType = cell.getCellTypeEnum();
@@ -126,7 +132,7 @@ public class CellTypeUtil {
 			try {
 				getDateEnum(value);
 				return TypeEnum.DATE_STR;
-			} catch (IllegalArgumentException e) {
+			} catch (ExcelIllegalArgumentException e) {
 				return TypeEnum.STRING;
 			}
 		case NUMERIC:
@@ -159,31 +165,115 @@ public class CellTypeUtil {
 	 * 判别日期的类型(可包含/-.字符或者年月日号汉字)
 	 * @param string 要匹配的数据
 	 * @return 是日期类型返回DateEnum结果<br>不是日期类型则抛出异常
-	 * @throws IllegalArgumentException 数据不是DateEnum类型
+	 * @throws ExcelIllegalArgumentException 参数不是DateEnum类型
 	 */
-	public static DateEnum getDateEnum(String string) throws IllegalArgumentException{
-		String regex = "[年月日号]{1}";
+	public static DateEnum getDateEnum(String string) throws ExcelIllegalArgumentException{
+		String regex = "([/-]|\\.){1}";
 		Pattern pattern = Pattern.compile(regex);
 		Matcher matcher = pattern.matcher(string);
-		if(matcher.find()){ //有年月日汉字
-			if (Pattern.matches(dateRegexString_ymd_chinese, string)) {
-				return DateEnum.yyyy_MM_dd_chinese;
-			}else if (Pattern.matches(dateRegexString_ym_chinese, string)) {
-				return DateEnum.yyyy_MM_chinese;
-			}else if (Pattern.matches(dateRegexString_md_chinese, string)) {
-				return DateEnum.MM_dd_chinese;
-			}
-		}else{
-			if(Pattern.matches(dateRegexString_ymd, string)){
+		if(matcher.find()){//包含/.- 
+			if (Pattern.matches(dateRegexString_ymd, string)) {
 				return DateEnum.yyyy_MM_dd;
-			}else if (Pattern.matches(dateRegexString_ym, string)) {
+			} else if (Pattern.matches(dateRegexString_ym, string)) {
 				return DateEnum.yyyy_MM;
-			}else if (Pattern.matches(dateRegexString_md, string)) {
+			} else if (Pattern.matches(dateRegexString_md, string)) {
 				return DateEnum.MM_dd;
 			}
+		}else{
+			String regex2 = "[年月日号]{1}";
+			pattern = Pattern.compile(regex2);
+			matcher = pattern.matcher(string);
+			if(matcher.find()){//有年月日汉字
+				if (Pattern.matches(dateRegexString_ymd_chinese, string)) {
+					return DateEnum.yyyy_MM_dd_chinese;
+				}else if (Pattern.matches(dateRegexString_ym_chinese, string)) {
+					return DateEnum.yyyy_MM_chinese;
+				}else if (Pattern.matches(dateRegexString_md_chinese, string)) {
+					return DateEnum.MM_dd_chinese;
+				}
+			}
 		}
-		throw new IllegalArgumentException();
+		throw new ExcelIllegalArgumentException();
 	}
 	
+	/**
+	 * 获取标准化日期格式
+	 * @param dateValue
+	 * @return 日期类型格式(yyyy-MM-dd,yyyy-MM,MM-dd)
+	 * @throws ExcelIllegalArgumentException 参数不是DateEnum类型
+	 */
+	public static String getFormatDate(String dateValue) throws ExcelIllegalArgumentException{
+		DateEnum dateEnum = getDateEnum(dateValue);
+		SimpleDateFormat sdf = null;
+		try {
+			switch (dateEnum) {
+			case yyyy_MM_dd_chinese:
+				dateValue = dateValue.replaceAll("[年月]{1}", "-");
+				dateValue = dateValue.replaceAll("[日号]?", "");
+				if (dateValue.length() != 10) {
+					sdf = new SimpleDateFormat("yyyy-MM-dd");
+					Date date2 = sdf.parse(dateValue);
+					dateValue = sdf.format(date2);
+				}
+				break;
+			case yyyy_MM_chinese:
+				dateValue = dateValue.replaceAll("[年月]{1}", "-");
+				if (dateValue.length() != 7) {
+					sdf = new SimpleDateFormat("yyyy-MM");
+					Date date2 = sdf.parse(dateValue);
+					dateValue = sdf.format(date2);
+				}
+				break;
+			case MM_dd_chinese:
+				dateValue = dateValue.replaceAll("月{1}", "-");
+				dateValue = dateValue.replaceAll("[日号]?", "");
+				if (dateValue.length() != 5) {
+					sdf = new SimpleDateFormat("MM-dd");
+					Date date2 = sdf.parse(dateValue);
+					dateValue = sdf.format(date2);
+				}
+				break;
+			case yyyy_MM_dd:
+				dateValue = dateValue.replaceAll("([/-]|\\.){1}", "-");
+				if (dateValue.length() != 10) {
+					sdf = new SimpleDateFormat("yyyy-MM-dd");
+					Date date2 = sdf.parse(dateValue);
+					dateValue = sdf.format(date2);
+				}
+				break;
+			case yyyy_MM:
+				dateValue = dateValue.replaceAll("[/-]{1}", "-");
+				if (dateValue.length() != 7) {
+					sdf = new SimpleDateFormat("yyyy-MM-dd");
+					Date date2 = sdf.parse(dateValue);
+					dateValue = sdf.format(date2);
+				}
+				break;
+			case MM_dd:
+				dateValue = dateValue.replaceAll("[/-]{1}", "-");
+				if (dateValue.length() != 5) {
+					sdf = new SimpleDateFormat("yyyy-MM-dd");
+					Date date2 = sdf.parse(dateValue);
+					dateValue = sdf.format(date2);
+				}
+				break;
+			default:
+				break;
+			}
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return dateValue;
+	}
 	
+	/**
+	 * 获取标准化日期格式
+	 * @param dateValue
+	 * @return 日期类型格式(yyyy-MM-dd)
+	 */
+	public static String getFormatDate(double dateValue){
+		Date date = DateUtil.getJavaDate(dateValue);
+		String string = new SimpleDateFormat("yyyy-MM-dd").format(date);
+		return string;
+	}
 }

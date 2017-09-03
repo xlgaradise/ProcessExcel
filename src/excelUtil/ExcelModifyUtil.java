@@ -6,19 +6,16 @@ package excelUtil;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.DataFormat;
-import org.apache.poi.ss.usermodel.IndexedColors;
-import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
-import excelUtil.CellTypeUtil.TypeEnum;
+import exception.ExcelIllegalArgumentException;
+import exception.ExcelNullParameterException;
 
+/**
+ *文件修改工具
+ */
 public class ExcelModifyUtil {
 	
 	/*%%%%%%%%-------字段部分 开始----------%%%%%%%%%*/
@@ -32,177 +29,107 @@ public class ExcelModifyUtil {
 	/**
 	 * 创建Excel文件修改工具
 	 * @param excelReadUtil
-	 * @throws IllegalArgumentException 参数为null
+	 * @throws ExcelNullParameterException 参数为null
 	 */
-	public ExcelModifyUtil(ExcelReadUtil excelReadUtil) throws IllegalArgumentException{
+	public ExcelModifyUtil(ExcelReadUtil excelReadUtil) throws ExcelNullParameterException{
 		if(excelReadUtil == null){
-			throw new IllegalArgumentException();
+			throw new ExcelNullParameterException();
 		}
 		this.workbook = excelReadUtil.getWorkBook();
 		this.path = excelReadUtil.getFilePath();
 	}
 	
+	public Workbook getWorkBook(){
+		return workbook;
+	}
+
+	/**
+	 * 创建新的sheet
+	 * @return sheet实例
+	 */
+	public Sheet createSheet(){
+		return this.workbook.createSheet();
+	}
 	
 	/**
-	 * 将数据添加至单元格中
-	 * @param cell 单元格(若为null，则不执行该方法)
-	 * @param value 数据值 (日期值必须符合(yyyy-MM-dd,yyyy-MM,MM-dd))
-	 * @param cellType 单元格所属类型
-	 * @param cellStyle 单元格样式(可为null，若cellType为日期格式则需传递新的cellStyle实例)
-	 * @throws (-----详细信息保存在message里-------)
-	 * @throws IllegalArgumentException  数据值格式错误
+	 * 创建新的sheet
+	 * @param sheetName sheet名称
+	 * @return sheet实例,或者抛出异常
+	 * @throws IllegalArgumentException sheet名为null,或者包含非法参数,或者名称已存在
 	 */
-	public void addValueToCell(Cell cell,String value,
-			TypeEnum cellType,CellStyle cellStyle) throws IllegalArgumentException{
-		
-		if(cell == null){
-			return;
-		}
-		if(cellStyle == null){
-			CellStyleUtil cellStyleUtil = new CellStyleUtil(workbook);
-			cellStyle = cellStyleUtil.getCommonCellStyle_alignCenter();
-		}
-		switch (cellType) {
-		case STRING:
-			cell.setCellStyle(cellStyle);
-			cell.setCellValue(value);
-			break;
-		case NUMERIC:
-			double dd = 0;
-			try{
-				dd = Double.parseDouble(value);
-			}catch (NullPointerException e) {
-				throw new IllegalArgumentException("numeric value can't parse to double");
-			}catch (NumberFormatException e) {
-				throw new IllegalArgumentException("numeric value can't parse to double");
-			}
-			int in = (int) dd;
-			double last = dd - in;
-			cell.setCellStyle(cellStyle);
-			if (last == 0) // double为整数
-				cell.setCellValue(in);
-			else
-				cell.setCellValue(dd);
-			break;
-		case DATE_NUM:
-			DataFormat	dataFormat_num = this.workbook.createDataFormat();
-			cellStyle.setDataFormat(dataFormat_num.getFormat("yyyy-MM-dd"));
-			Date dateNum = null;
-			try {
-				dateNum = new SimpleDateFormat("yyyy-MM-dd").parse(value);
-			} catch (ParseException e) {
-				throw new IllegalArgumentException("Date value is not dateFormat");
-			}
-			cell.setCellStyle(cellStyle);
-			cell.setCellValue(dateNum);
-			break;
-		case DATE_STR:
-			DataFormat dataFormat = this.workbook.createDataFormat();
-			short formatNum = 0;
-			SimpleDateFormat simpleDateFormat = null;
-			Date dateStr = null;
-			//Value格式为((yyyy-MM-dd,yyyy-MM,MM-dd))
-			int length = value.length();
-			if(length == 10){
-				simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-			 	formatNum = dataFormat.getFormat("yyyy-MM-dd");
-			}else if (length == 7) {
-				simpleDateFormat = new SimpleDateFormat("yyyy-MM");
-				formatNum = dataFormat.getFormat("yyyy-MM");
-			}else {
-				simpleDateFormat = new SimpleDateFormat("MM-dd");
-				formatNum = dataFormat.getFormat("MM-dd");
-			}
-			try {
-				dateStr = simpleDateFormat.parse(value);
-			} catch (ParseException e) {
-				throw new IllegalArgumentException("Date value is not dateFormat");
-			}
-			cellStyle.setDataFormat(formatNum);
-			cell.setCellStyle(cellStyle);
-			cell.setCellValue(dateStr);
-			break;
-		case ERROR:
-			cell.setCellStyle(cellStyle);
-			cell.setCellErrorValue(Byte.parseByte(value));
-			break;
-		case FORMULA:
-			cell.setCellStyle(cellStyle);
-			cell.setCellFormula(value);
-			break;
-		case BOOLEAN:
-			cell.setCellStyle(cellStyle);
-			cell.setCellValue(Boolean.parseBoolean(value));
-			break;
-		case BLANK:
-		default:
-			cell.setCellStyle(cellStyle);
-			cell.setCellValue("");
+	public Sheet createSheet(String sheetName) throws IllegalArgumentException{
+		try {
+			return workbook.createSheet(sheetName);
+		} catch (IllegalArgumentException e) {
+			throw e;
 		}
 	}
 	
-
 	/**
-	 * 将workbook内容写入Excel文件
+	 * 获取指定sheet的下标
+	 * @param sheetName
+	 * @return index of the sheet (0 based)
+	 */
+	public int getSheetIndex(String sheetName){
+		return this.workbook.getSheetIndex(sheetName);
+	}
+	
+	/**
+	 * 获取指定sheet的下标
+	 * @param sheet
+	 * @return index of the sheet (0 based)
+	 */
+	public int getSheetIndex(Sheet sheet){
+		return this.workbook.getSheetIndex(sheet);
+	}
+	
+	/**
+	 * 设置指定sheet为活动状态
+	 * @param sheetIndex (0-based)
+	 * @throws ExcelIllegalArgumentException 下标参数不在有效范围内
+	 */
+	public void setActivitySheet(int sheetIndex) throws ExcelIllegalArgumentException{
+		int count = this.workbook.getNumberOfSheets();
+		if(sheetIndex < 0 || sheetIndex == count){
+			throw new ExcelIllegalArgumentException();
+		}
+		this.workbook.setActiveSheet(sheetIndex);
+	}
+	
+	/**
+	 * 删除指定下标的sheet
+	 * @param sheetIndex (0-based)
+	 * @throws ExcelIllegalArgumentException 下标参数不在有效范围内
+	 */
+	public void removeSheetAt(int sheetIndex) throws ExcelIllegalArgumentException{
+		int count = this.workbook.getNumberOfSheets();
+		if(sheetIndex < 0 || sheetIndex == count){
+			throw new ExcelIllegalArgumentException();
+		}
+		this.workbook.removeSheetAt(sheetIndex);
+	}
+	
+	/**
+	 * 删除指定名称的sheet
+	 * @param sheetName
+	 * @throws ExcelIllegalArgumentException 名称参数不是有效名称
+	 */
+	public void removeSheetByName(String sheetName) throws ExcelIllegalArgumentException{
+		int index = getSheetIndex(sheetName);
+		removeSheetAt(index);
+	}
+	
+	/**
+	 * 将workbook的跟新内容保存到原Excel文件
 	 * @throws FileNotFoundException 文件已被另一个程序打开
 	 * @throws SecurityException 拒绝对文件进行写入访问
 	 * @throws IOException 文件写入或者关闭出错
 	 */
-	public void writeToExcel() throws FileNotFoundException,SecurityException,IOException{
-		try {
-			FileOutputStream outputStream = new FileOutputStream(this.path);
-			workbook.write(outputStream);
-			outputStream.flush();
-			outputStream.close();
-		} catch (FileNotFoundException e) {
-			throw e;
-		} catch (SecurityException e) {
-			throw e;
-		} catch (IOException e) {
-			throw e;
-		}
-	}
-	
-	/**
-	 * 设置指定行的前景色
-	 * @param row Row实例(如果Row为null或者没有Cell则不执行方法)
-	 * @param color 颜色
-	 */
-	public void setForegroundColor(Row row,IndexedColors color){
-		if(row == null){
-			return;
-		}
-		int count = row.getLastCellNum();
-		if(count == -1){
-			return;
-		}
-		
-		CellStyleUtil cellStyleUtil = new CellStyleUtil(workbook);
-		CellStyle cellStyle = cellStyleUtil.getCommonCellStyle_alignCenter();
-		cellStyle.setWrapText(false);
-		for(int i=0;i<count;i++){
-			Cell cell = row.getCell(i);
-			if(cell == null){
-				cell = row.createCell(i);
-			}
-			cellStyleUtil.setForegroundColor(cellStyle, color);
-			cell.setCellStyle(cellStyle);
-		}
-	}
-	
-	/**
-	 * 设置指定单元格的前景色
-	 * @param cell 指定单元格(如果Cell为null则不执行方法)
-	 * @param color 指定颜色
-	 */
-	public void setForegroundColor(Cell cell,IndexedColors color){
-		if(cell == null)
-			return;
-		CellStyleUtil cellStyleUtil = new CellStyleUtil(workbook);
-		CellStyle cellStyle = cellStyleUtil.getCommonCellStyle_alignCenter();
-		cellStyle.setWrapText(false);
-		cellStyleUtil.setForegroundColor(cellStyle, color);
-		cell.setCellStyle(cellStyle);
+	public void saveExcel() throws FileNotFoundException,SecurityException,IOException{
+		FileOutputStream outputStream = new FileOutputStream(this.path);
+		workbook.write(outputStream);
+		outputStream.flush();
+		outputStream.close();
 	}
 	
 	/**

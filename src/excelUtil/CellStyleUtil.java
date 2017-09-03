@@ -9,8 +9,10 @@ import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.IndexedColors;
-import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFFont;
+
+import exception.ExcelNullParameterException;
 
 /**
  *单元格样式工具
@@ -28,11 +30,11 @@ public class CellStyleUtil {
 	/**
 	 * 创建单元格样式工具
 	 * @param workbook
-	 * @throws IllegalArgumentException workbook为null
+	 * @throws ExcelNullParameterException workbook为null
 	 */
-	public CellStyleUtil(Workbook workbook) throws IllegalArgumentException{
+	public CellStyleUtil(Workbook workbook) throws ExcelNullParameterException{
 		if(workbook == null){
-			throw new IllegalArgumentException();
+			throw new ExcelNullParameterException();
 		}
 		this.workbook = workbook;
 	}
@@ -47,13 +49,27 @@ public class CellStyleUtil {
 	}
 	
 	/**
+	 * 返回通用单元格样式(水平跨列居中、自动换行、宋体、大小10、不加粗)
+	 * @return
+	 */
+	public CellStyle getCommonCellStyle(){
+		CellStyle cellStyle = workbook.createCellStyle();
+		cellStyle.setAlignment(HorizontalAlignment.CENTER_SELECTION); //水平跨列居中
+		cellStyle.setWrapText(true);//自动换行
+		
+		XSSFFont contenetFont = (XSSFFont) getCommonFont_content();
+		cellStyle.setFont(contenetFont);
+		return cellStyle;
+	}
+	
+	/**
 	 * 返回通用单元格样式(水平跨列居中、垂直居中、自动换行)
 	 * @return
 	 */
 	public CellStyle getCommonCellStyle_alignCenter(){
 		CellStyle cellStyle = workbook.createCellStyle();
 		cellStyle.setAlignment(HorizontalAlignment.CENTER_SELECTION); //水平跨列居中
-		cellStyle.setVerticalAlignment(VerticalAlignment.CENTER); //垂直居中
+		//cellStyle.setVerticalAlignment(VerticalAlignment.CENTER); //垂直居中
 		cellStyle.setWrapText(true);//自动换行
 		return cellStyle;
 	}
@@ -65,7 +81,7 @@ public class CellStyleUtil {
 	public CellStyle getCommonCellStyle_alignLeft(){
 		CellStyle cellStyle = workbook.createCellStyle();
 		cellStyle.setAlignment(HorizontalAlignment.LEFT); //水平靠左
-		cellStyle.setVerticalAlignment(VerticalAlignment.CENTER); //垂直居中
+		//cellStyle.setVerticalAlignment(VerticalAlignment.CENTER); //垂直居中
 		cellStyle.setWrapText(true);//自动换行
 		return cellStyle;
 	}
@@ -77,7 +93,7 @@ public class CellStyleUtil {
 	public CellStyle getCommonCellStyle_alignRight(){
 		CellStyle cellStyle = workbook.createCellStyle();
 		cellStyle.setAlignment(HorizontalAlignment.RIGHT); //水平靠右
-		cellStyle.setVerticalAlignment(VerticalAlignment.CENTER); //垂直居中
+		//cellStyle.setVerticalAlignment(VerticalAlignment.CENTER); //垂直居中
 		cellStyle.setWrapText(true);//自动换行
 		return cellStyle;
 	}

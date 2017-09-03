@@ -1,9 +1,5 @@
-package excelUtil;
-/**
- *@auchor HPC
- *
- */
 
+package excelUtil;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -12,122 +8,139 @@ import java.util.Date;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.DataFormat;
-import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.xssf.streaming.SXSSFSheet;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
 import excelUtil.CellTypeUtil.TypeEnum;
 import exception.ExcelIllegalArgumentException;
 import exception.ExcelIndexOutOfBoundsException;
 import exception.ExcelNullParameterException;
 
-
 /**
- *写sheet表的工具
- */
-public class SheetWriteUtil {
+*@auchor HPC
+*@encoding GBK
+*/
+
+public class SheetModifyUtil {
 	
-	//%%%%%%%%-------字段部分 开始----------%%%%%%%%%
-	
+	// %%%%%%%%-------字段部分 开始----------%%%%%%%%%
+
 	/**
 	 * 实例的sheet
 	 */
-	protected SXSSFSheet sheet;
-	
-	/**
-	 * 该sheet的所有行数据
-	 */
-	//private ArrayList<Row> rowList = null;
-	
+	protected Sheet sheet;
+
 	/**
 	 * Excel工作薄
 	 */
-	protected SXSSFWorkbook workbook = null;
-	
-	//所有合并区域的极值下标
-	protected int minRowIndexOfMergedRange = 0;
-	protected int maxRowIndexOfMergedRange = 0;
-	protected int minColumnIndexOfMergedRange = 0;
-	protected int maxColumnIndexOfMergedRange = 0;
-	
-	//%%%%%%%%-------字段部分 结束----------%%%%%%%%%
-	
-	
-	
-	
+	protected Workbook workbook = null;
+
+	// %%%%%%%%-------字段部分 结束----------%%%%%%%%%
 
 	/**
 	 * 创建写sheet的工具
-	 * @param sheet 将要写入数据的sheet,从ExcelWriteUtil获取
+	 * 
+	 * @param sheet 将要写入数据的sheet,从ExcelReadUtil获取
 	 * @throws ExcelNullParameterException sheet为null
 	 */
-	public SheetWriteUtil(SXSSFSheet sheet) throws ExcelNullParameterException{
-		if(sheet == null)
+	public SheetModifyUtil(Sheet sheet) throws ExcelNullParameterException {
+		if (sheet == null)
 			throw new ExcelNullParameterException();
 		this.sheet = sheet;
 		this.workbook = sheet.getWorkbook();
-		this.sheet.trackAllColumnsForAutoSizing();
-		
 	}
-	
-	
-	public SXSSFSheet getSheet(){
+
+	public Sheet getSheet() {
 		return this.sheet;
 	}
 
-	public Workbook getWorkBook(){
-		return this.workbook;
+	
+	/**
+	 * 删除某一行
+	 * @param row
+	 */
+	public void removeRow(Row row){
+		this.sheet.removeRow(row);
 	}
 	
 	
 	/**
-	 * 添加合并单元格
-	 * @param startRowIndex 起始行下标
-	 * @param endRowIndex 结束行下标
-	 * @param startColumnIndex 起始列下标
-	 * @param endColumnIndex 结束列下标
-	 * @throws ExcelIllegalArgumentException  endIndex 小于 startIndex
+	 * 删除某一行
+	 * @param rowIndex
+	 * @throws ExcelIllegalArgumentException 下标值不在有效范围
 	 */
-	public void addMergedRegion(int startRowIndex,int endRowIndex,int startColumnIndex,int endColumnIndex)
-												throws ExcelIllegalArgumentException{
-		if(startRowIndex > endRowIndex || startColumnIndex > endColumnIndex){
+	public void removeRowAt(int rowIndex) throws ExcelIllegalArgumentException{
+		int endIndex = sheet.getLastRowNum();
+		if(rowIndex < 0 || rowIndex > endIndex){
 			throw new ExcelIllegalArgumentException();
-		}else{
-			sheet.addMergedRegion(new CellRangeAddress(startRowIndex,endRowIndex,startColumnIndex,endColumnIndex));
-			if(startRowIndex < minRowIndexOfMergedRange)
-				minRowIndexOfMergedRange = startRowIndex;
-			if(endRowIndex > maxRowIndexOfMergedRange)
-				maxRowIndexOfMergedRange = endRowIndex;
-			if(startColumnIndex < minColumnIndexOfMergedRange)
-				minColumnIndexOfMergedRange = startColumnIndex;
-			if(endColumnIndex > maxColumnIndexOfMergedRange)
-				maxColumnIndexOfMergedRange = endColumnIndex;
+		}
+		Row row = this.sheet.getRow(rowIndex);
+		removeRow(row);
+	}
+	
+	
+	/**
+	 * 删除某些行
+	 * @param startIndex (base 0)
+	 * @param length 
+	 * @throws ExcelIllegalArgumentException 下标值不在有效范围
+	 */
+	public void removeRowsIn(int startIndex,int length) throws ExcelIllegalArgumentException{
+		int endIndex = sheet.getLastRowNum();
+		if(startIndex < 0 || startIndex > endIndex){
+			throw new ExcelIllegalArgumentException();
+		}else if((startIndex + length - 1) > endIndex){
+			throw new ExcelIllegalArgumentException();
+		}
+		Row row = null;
+		for(int i=startIndex+length-1;i>=startIndex;i--){
+			row = sheet.getRow(i);
+			removeRow(row);
 		}
 	}
 	
 	/**
-	 * 获取有效行
-	 * @param rowIndex 行下标
+	 * 删除指定下标后的所有行
+	 * @param startIndex
+	 * @throws ExcelIllegalArgumentException 下标值不在有效范围
+	 */
+	public void removeRowsFrom(int startIndex) throws ExcelIllegalArgumentException{
+		int endIndex = sheet.getLastRowNum();
+		if(startIndex < 0 || startIndex > endIndex){
+			throw new ExcelIllegalArgumentException();
+		}
+		Row row = null;
+		for(int i=endIndex;i>=startIndex;i--){
+			row = sheet.getRow(i);
+			removeRow(row);
+		}
+	}
+	
+	/**
+	 * 获取某一行
+	 * @param rowIndex
+	 * @return Row实例或null
+	 */
+	public Row getRowAt(int rowIndex){
+		return sheet.getRow(rowIndex);
+	}
+	
+	/**
+	 * 在指定下标创建新的一行
+	 * @param rowIndex
 	 * @return Row实例
 	 */
-	public Row getValidRow(int rowIndex){
-		Row row = sheet.getRow(rowIndex);
-		if(row == null){
-			row = sheet.createRow(rowIndex);
-			row.setHeightInPoints(21);
-		}
-		return row;
+	public Row createNewRow(int rowIndex){
+		return sheet.createRow(rowIndex);
 	}
 	
 	/**
 	 * 获取有效的Cell单元(非合并区域内部的单元)
 	 * @param rowIndex 行下标
 	 * @param columnIndex 列下标
-	 * @return 指定单元格,或者null(无效单元格),或者抛出异常
+	 * @return 指定单元格,或者null(无效单元格)
 	 * @throws ExcelIndexOutOfBoundsException 下标参数小于零
 	 * @throws IllegalArgumentException columnIndex < 0 或者 大于文件提供最大值
 	 */
@@ -149,14 +162,14 @@ public class SheetWriteUtil {
 		return cell;
 		
 	}
-	
+		
 	/**
 	 * 将数据添加至单元格中
 	 * @param cell 单元格(若为null，则不执行该方法)
 	 * @param value 数据值 (日期值必须符合(yyyy-MM-dd,yyyy-MM,MM-dd))
 	 * @param cellType 单元格所属类型
 	 * @param cellStyle 单元格样式(可为null，若cellType为日期格式则需传递新的cellStyle实例)
-	 * @throws ExcelIllegalArgumentException  数据格式对应数值错误
+	 * @throws ExcelIllegalArgumentException  数据值不匹配对应格式
 	 */
 	public void addValueToCell(Cell cell,String value,
 			TypeEnum cellType,CellStyle cellStyle) throws ExcelIllegalArgumentException{
@@ -233,8 +246,6 @@ public class SheetWriteUtil {
 			cell.setCellValue(dateStr);
 			break;
 		case ERROR:
-			cellStyle.setFillForegroundColor(IndexedColors.RED.index);
-			cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 			cell.setCellStyle(cellStyle);
 			//cell.setCellErrorValue(Byte.parseByte(value));
 			cell.setCellValue(value);
@@ -266,14 +277,6 @@ public class SheetWriteUtil {
 		}
 	}
 	
-	/**
-	 * 设置锁定区域
-	 * @param colSplit 左边锁定的列数(base 1)
-	 * @param rowSplit 上边锁定的行数(base 1)
-	 */
-	public void setFreezePane(int colSplit, int rowSplit){
-		sheet.createFreezePane(colSplit,rowSplit);
-	}
 	
 	/**
 	 * 设置指定行的前景色
@@ -325,13 +328,6 @@ public class SheetWriteUtil {
 		cell.setCellStyle(cellStyle);
 	}
 	
-	/**
-	 * 设置某列自动调整列宽
-	 * @param columnIndex 要调整列宽的下标
-	 */
-	public void setAutoSizeColumn(int columnIndex){
-		sheet.autoSizeColumn(columnIndex);
-	}
 	
 	/**
 	 * 获取指定的Cell
@@ -342,10 +338,8 @@ public class SheetWriteUtil {
 	 */
 	protected Cell getCell(int rowIndex,int columnIndex) throws IllegalArgumentException{
 		Row row = sheet.getRow(rowIndex);
-		if(row == null){
+		if(row == null)
 			row = sheet.createRow(rowIndex);
-			row.setHeightInPoints(21);
-		}
 		Cell cell = row.getCell(columnIndex);
 		if(cell == null)
 			try {
@@ -355,5 +349,4 @@ public class SheetWriteUtil {
 			}
 		return cell;
 	}
-
 }

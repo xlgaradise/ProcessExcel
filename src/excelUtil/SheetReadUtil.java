@@ -19,6 +19,10 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.util.CellRangeAddress;
 
 import excelUtil.CellTypeUtil.TypeEnum;
+import exception.ExcelIllegalArgumentException;
+import exception.ExcelIndexOutOfBoundsException;
+import exception.ExcelNoTitleException;
+import exception.ExcelNullParameterException;
 
 /**
  *读sheet表的工具,可获取行、列、单元格等
@@ -50,11 +54,11 @@ public class SheetReadUtil {
 	/**
 	 * 创建读sheet的工具
 	 * @param sheet 将要操作的sheet实例,从ExcelReadUtil获取
-	 * @throws IllegalArgumentException 参数为null
+	 * @throws ExcelNullParameterException 参数为null
 	 */
-	public SheetReadUtil(Sheet sheet) throws IllegalArgumentException{
+	public SheetReadUtil(Sheet sheet) throws ExcelNullParameterException{
 		if(sheet == null){
-			throw new IllegalArgumentException();
+			throw new ExcelNullParameterException();
 		}
 		this.sheet = sheet;
 		rowList = new ArrayList<>();
@@ -71,36 +75,43 @@ public class SheetReadUtil {
 	}
 	
 	/**
+	 * 获取sheet中有效的行数
+	 * @return
+	 */
+	public int getPhysicalNumberOfRows(){
+		return sheet.getPhysicalNumberOfRows();
+	}
+	
+	/**
 	 * 读取Sheet中所有的行
 	 */
 	public void readAllRows(){
 		rowList.clear();
 		int rowsCount = sheet.getLastRowNum() + 1;
-		readRows(0, rowsCount);
+		try {
+			readRows(0, rowsCount);
+		} catch (ExcelIndexOutOfBoundsException e) {
+		}
 	}
 
 	/**
 	 * 读取sheet中指定的行
 	 * @param startIndex 开始的行下标
 	 * @param length 读取长度
-	 * @throws IndexOutOfBoundsException 起始下标不能小于零或大于最大值，length读取的长度不能小于0
+	 * @throws ExcelIndexOutOfBoundsException 起始下标不能小于零或大于最大值，length读取的长度不能小于0
 	 */
-	public void readRows(int startIndex,int length) throws IndexOutOfBoundsException{
+	public void readRows(int startIndex,int length) throws ExcelIndexOutOfBoundsException{
 		rowList.clear();
 		int rowsCount = sheet.getLastRowNum() + 1;
-		try {
-			int endIndex = isIndexOutOfBounds(rowsCount, startIndex, length);
-			for(int i = startIndex;i<=endIndex;i++){
-				if(endIndex == 0){//只读sheet的第一行
-					Row r = sheet.getRow(0);
-					if(r != null)
-						this.rowList.add(r);
-				}else{
-					this.rowList.add(sheet.getRow(i));
-				}
+		int endIndex = isIndexOutOfBounds(rowsCount, startIndex, length);
+		for (int i = startIndex; i <= endIndex; i++) {
+			if (endIndex == 0) {// 只读sheet的第一行
+				Row r = sheet.getRow(0);
+				if (r != null)
+					this.rowList.add(r);
+			} else {
+				this.rowList.add(sheet.getRow(i));
 			}
-		} catch (IndexOutOfBoundsException e) {
-			throw e;
 		}
 	}
 	
@@ -112,23 +123,21 @@ public class SheetReadUtil {
 		return rowList;
 	}
 	
+	
+	
 	/**
 	 * 通过指定标题属性值从数据集里获取指定的RowList列表
 	 * @param rows Row列表数据集
 	 * @param title 标题名称
 	 * @param value 标题属性值
 	 * @return 返回指定RowList列表
-	 * @throws IllegalArgumentException 标题值不存在
-	 * @throws IllegalStateException 未设置标题
+	 * @throws ExcelIllegalArgumentException 指定标题不存在
+	 * @throws ExcelNoTitleException 未设置标题
 	 */
-	public ArrayList<Row> getRowListByArg(ArrayList<Row> rows,String title,String value) 
-			throws IllegalArgumentException,IllegalStateException{
-		int columnIndex = -1;
-		try {
-			columnIndex = getTitleColIndexByValue(title);
-		} catch (IllegalStateException e) {
-			throw e;
-		}
+	/*public ArrayList<Row> getRowListByArg(ArrayList<Row> rows,String title,String value) 
+			throws ExcelIllegalArgumentException,ExcelNoTitleException{
+		
+		int columnIndex = getTitleColIndexByValue(title);
 		ArrayList<Row> rowList = null;
 		if(columnIndex != -1){//title值存在
 			rowList = new ArrayList<>();
@@ -143,9 +152,9 @@ public class SheetReadUtil {
 			}
 			return rowList;
 		}else{
-			throw new IllegalArgumentException("title值不存在");
+			throw new ExcelIllegalArgumentException();
 		}
-	}
+	}*/
 	
 	/**
 	 * 通过指定标题属性值从数据集获取指定的RowList列表
@@ -154,47 +163,46 @@ public class SheetReadUtil {
 	 * @param title 标题名称
 	 * @param value 标题属性值
 	 * @return 返回指定RowList列表
-	 * @throws IndexOutOfBoundsException 起始下标不能小于零或大于最大值，length读取的长度不能小于0
-	 * @throws IllegalArgumentException 标题值不存在
-	 * @throws IllegalStateException 未设置标题
+	 * @throws ExcelIndexOutOfBoundsException 起始下标不能小于零或大于最大值，length读取的长度不能小于0
+	 * @throws ExcelIllegalArgumentException 指定标题不存在
+	 * @throws ExcelNoTitleException 未设置标题
 	 */
-	public ArrayList<Row> getRowListByArg(int startRowIndex,int length,String title,String value) throws
-				IndexOutOfBoundsException,IllegalArgumentException,IllegalStateException{
+	/*public ArrayList<Row> getRowListByArg(int startRowIndex,int length,String title,String value) throws
+				ExcelIndexOutOfBoundsException,ExcelIllegalArgumentException,ExcelNoTitleException{
 		int count = rowList.size();
 		ArrayList<Row> returnList = new ArrayList<>();
-		try {
-			int endIndex = isIndexOutOfBounds(count, startRowIndex, length);
-			ArrayList<Row> rows = new ArrayList<>();
-			for(int i=startRowIndex;i<=endIndex;i++){
-				rows.add(rowList.get(i));
-			}
-			returnList = getRowListByArg(rows, title, value);
-			return returnList;
-		} catch (IndexOutOfBoundsException e) {
-			throw e;
-		}catch (IllegalArgumentException e) {
-			throw e;
-		}catch (IllegalStateException e) {
-			throw e;
+		
+		int endIndex = isIndexOutOfBounds(count, startRowIndex, length);
+		ArrayList<Row> rows = new ArrayList<>();
+		for (int i = startRowIndex; i <= endIndex; i++) {
+			rows.add(rowList.get(i));
 		}
-	}
+		returnList = getRowListByArg(rows, title, value);
+		return returnList;
+	}*/
+	
+	
 	
 	/**
 	 * 获取指定Row的所有CellList
 	 * @param row 指定Row
 	 * @return 返回cellList
-	 * @throws IllegalArgumentException 参数为null
+	 * @throws ExcelNullParameterException 参数为null
 	 */
-	public ArrayList<Cell> getOneRowAllCells(Row row) throws IllegalArgumentException{
+	/*public ArrayList<Cell> getOneRowAllCells(Row row) throws ExcelNullParameterException{
 		if(row == null){
-			throw new IllegalArgumentException();
+			throw new ExcelNullParameterException();
 		}
 		int count = row.getLastCellNum();
 		if(count == -1){
 			return new ArrayList<Cell>();
 		}
-		return getOneRowCellList(row, 0, count);
-	}
+		try {
+			return getOneRowCellList(row, 0, count);
+		} catch (ExcelIndexOutOfBoundsException e) {
+			return new ArrayList<Cell>();
+		}
+	}*/
 	
 	/**
 	 * 获取指定Row中指定的CellList
@@ -202,46 +210,40 @@ public class SheetReadUtil {
 	 * @param startColumnIndex 起始的列下标值
 	 * @param length 所需长度值
 	 * @return 返回cellList或者抛出错误
-	 * @throws IndexOutOfBoundsException 起始下标不能小于零或大于最大值，length读取的长度不能小于0
-	 * @throws IllegalArgumentException 参数row为null
+	 * @throws ExcelIndexOutOfBoundsException 起始下标不能小于零或大于最大值，length读取的长度不能小于0
+	 * @throws ExcelNullParameterException 参数row为null
 	 */
 	public ArrayList<Cell> getOneRowCellList(Row row,int startColumnIndex,int length) throws 
-					IndexOutOfBoundsException,IllegalArgumentException{
+					ExcelIndexOutOfBoundsException,ExcelNullParameterException{
 		if(row == null){
-			throw new IllegalArgumentException();
+			throw new ExcelNullParameterException();
 		}
 		ArrayList<Cell> cellList = new ArrayList<>();
 		int count = row.getLastCellNum();
 		if(count == -1){
 			return cellList;
 		}
-		try {
-			int endIndex = isIndexOutOfBounds(count, startColumnIndex, length);
-			Cell c = null;
-			for(int i=startColumnIndex;i<=endIndex;i++){
-				c = row.getCell(i);
-				cellList.add(c);
-			}
-			return cellList;
-		} catch (IndexOutOfBoundsException e) {
-			throw e;
+		
+		int endIndex = isIndexOutOfBounds(count, startColumnIndex, length);
+		Cell c = null;
+		for (int i = startColumnIndex; i <= endIndex; i++) {
+			c = row.getCell(i);
+			cellList.add(c);
 		}
+		return cellList;
+		
 	}
 	
 	/**
 	 * 获取一列的所有Cells
 	 * @param columnIndex 指定的列下标值
 	 * @return 返回cellList或者抛出错误
-	 * @throws IndexOutOfBoundsException 下标值越界
+	 * @throws ExcelIndexOutOfBoundsException 下标值越界
 	 */
-	public ArrayList<Cell> getOneColumnAllCells(int columnIndex) throws IndexOutOfBoundsException{
-		try {
-			int length = rowList.size();
-			return getOneColumnCellList(columnIndex, 0, length);
-		} catch (IndexOutOfBoundsException e) {
-			throw e;
-		}
-	}
+	/*public ArrayList<Cell> getOneColumnAllCells(int columnIndex) throws ExcelIndexOutOfBoundsException{
+		int length = rowList.size();
+		return getOneColumnCellList(columnIndex, 0, length);
+	}*/
 	
 	/**
 	 * 获取一列中指定的Cells
@@ -249,61 +251,60 @@ public class SheetReadUtil {
 	 * @param startRowIndex 开始的行下标值
 	 * @param length 所需长度
 	 * @return 返回cellList列表或者抛出错误
-	 * @throws IndexOutOfBoundsException 起始下标不能小于零或大于最大值，length读取的长度不能小于0
+	 * @throws ExcelIndexOutOfBoundsException 起始下标不能小于零或大于最大值，length读取的长度不能小于0
 	 */
-	public ArrayList<Cell> getOneColumnCellList(int cloumnIndex,int startRowIndex,int length) throws IndexOutOfBoundsException{
+	/*public ArrayList<Cell> getOneColumnCellList(int cloumnIndex,int startRowIndex,int length) 
+									throws ExcelIndexOutOfBoundsException{
 		ArrayList<Cell> cellList = new ArrayList<>();
 		int count = rowList.size();
-		try {
-			int endIndex = isIndexOutOfBounds(count, startRowIndex, length);
-			Cell cell = null;
-			Row row = null;
-			for(int i=startRowIndex;i<=endIndex;i++){
-				row = rowList.get(i);
-				if(row == null){
-					cellList.add(null);
-				}else{
-					cell = row.getCell(cloumnIndex);
-					cellList.add(cell);
-				}
+		
+		int endIndex = isIndexOutOfBounds(count, startRowIndex, length);
+		Cell cell = null;
+		Row row = null;
+		for (int i = startRowIndex; i <= endIndex; i++) {
+			row = rowList.get(i);
+			if (row == null) {
+				cellList.add(null);
+			} else {
+				cell = row.getCell(cloumnIndex);
+				cellList.add(cell);
 			}
-			return cellList;
-		} catch (IndexOutOfBoundsException e) {
-			throw e;
 		}
-	}
+		return cellList;
+	}*/
 	
 	/**
 	 * 设定sheet的标题列表
 	 * @param rowIndex sheet中行下标
 	 * @param startColumnIndex 开始列下标值
 	 * @param length 所需长度
-	 * @throws IndexOutOfBoundsException 起始下标不能小于零或大于最大值，length读取的长度不能小于0
-	 * @throws IllegalArgumentException 指定行为null,或没有数据
+	 * @throws ExcelIndexOutOfBoundsException 起始下标不能小于零或大于最大值，length读取的长度不能小于0
+	 * @throws ExcelIllegalArgumentException 指定下标行为null,或没有数据
 	 */
-	public void setTitles(int rowIndex,int startColumnIndex,int length) throws IndexOutOfBoundsException,
-																IllegalArgumentException{
+	public void setTitle(int rowIndex,int startColumnIndex,int length) throws ExcelIndexOutOfBoundsException,
+													ExcelIllegalArgumentException{
 		Row row = sheet.getRow(rowIndex);
 		if(row == null)
-			throw new IllegalArgumentException("该行为null");
+			throw new ExcelIllegalArgumentException();
 		int cellCount = row.getLastCellNum();
 		if(cellCount == -1){
-			throw new IllegalArgumentException("该行没有数据");
+			throw new ExcelIllegalArgumentException();
 		}
 		titles.clear();
+		
+		ArrayList<Cell> cells = null;
 		try {
-			ArrayList<Cell> cells = getOneRowCellList(row, startColumnIndex, length);
-			Cell cell = null;
-			for(int i=0;i<cells.size();i++){
-				cell = cells.get(i);
-				if(cell == null){
-					titles.put(startColumnIndex+i,"");
-				}else{
-					titles.put(startColumnIndex+i, getCellValue(cell));
-				}
+			cells = getOneRowCellList(row, startColumnIndex, length);
+		} catch (ExcelNullParameterException e) {
+		}
+		Cell cell = null;
+		for (int i = 0; i < cells.size(); i++) {
+			cell = cells.get(i);
+			if (cell == null) {
+				titles.put(startColumnIndex + i, "");
+			} else {
+				titles.put(startColumnIndex + i, getCellValue(cell));
 			}
-		} catch (IndexOutOfBoundsException e) {
-			throw e;
 		}
 	}
 	
@@ -311,7 +312,7 @@ public class SheetReadUtil {
 	 * 获取标题列表
 	 * @return 返回标题
 	 */
-	public HashMap<Integer, String> getTitles(){
+	public HashMap<Integer, String> getTitle(){
 		return titles;
 	}
 	
@@ -319,11 +320,11 @@ public class SheetReadUtil {
 	 * 通过标题值获取所在列下标
 	 * @param titleName 指定标题值
 	 * @return 标题列下标,不存在则返回-1
-	 * @throws IllegalStateException 未设置标题
+	 * @throws ExcelNoTitleException 未设置标题
 	 */
-	public int getTitleColIndexByValue(String titleName) throws IllegalStateException{
+	public int getTitleColIndexByValue(String titleName) throws ExcelNoTitleException{
 		if(titles.isEmpty()){
-			throw new IllegalStateException();
+			throw new ExcelNoTitleException();
 		}
 		for(Map.Entry<Integer, String> entry : titles.entrySet()){
 			if(entry.getValue().equals(titleName)) 
@@ -363,35 +364,11 @@ public class SheetReadUtil {
 				break;
 			case DATE_NUM:
 				double d = cell.getNumericCellValue();
-				Date date = DateUtil.getJavaDate(d);
-				string = new SimpleDateFormat("yyyy-MM-dd").format(date);
+				string = CellTypeUtil.getFormatDate(d);
 				break;
 			case DATE_STR:
 				string =  cell.getStringCellValue().trim();
-				switch (CellTypeUtil.getDateEnum(string)) {
-				case yyyy_MM_dd_chinese:
-					string = string.replaceAll("[年月]{1}", "-");
-					string = string.replaceAll("[日号]?", "");
-					break;
-				case yyyy_MM_chinese:
-					string = string.replaceAll("[年月]{1}", "-");
-					break;
-				case MM_dd_chinese:
-					string = string.replaceAll("月{1}", "-");
-					string = string.replaceAll("[日号]?", "");
-					break;
-				case yyyy_MM_dd:
-					string = string.replaceAll("([/-]|\\.){1}", "-");
-					break;
-				case yyyy_MM:
-					string = string.replaceAll("[/-]{1}", "-");
-					break;
-				case MM_dd:
-					string = string.replaceAll("[/-]{1}", "-");
-					break;		
-				default:
-					break;
-				}
+				string = CellTypeUtil.getFormatDate(string);
 				break;
 			case ERROR:
 				string = String.valueOf(cell.getErrorCellValue());
@@ -468,64 +445,46 @@ public class SheetReadUtil {
 		}
 	}
 	
-	/**
-	 * 按类型返回公式计算值
-	 * @param cellValue 
-	 * @return 数值或文本类型返回具体值，其他返回""。
-	 */
-	private static String getFormulaValue(CellValue cellValue) {
-        String value = "";
-        switch (cellValue.getCellTypeEnum()) {
-        case STRING:
-            value = cellValue.getStringValue();
-            break;
-        case NUMERIC:
-            value = String.valueOf(cellValue.getNumberValue());
-            break;
-        default:
-            break;
-        }
-        return value;
-    }
-	
 	
 	/**
 	 * 获取合并单元格的值 
 	 * @param cell 指定单元格
 	 * @return 单元格的值
-	 * @throws IllegalArgumentException 参数cell为null,或者cell不是合并单元格
+	 * @rhrows ExcelNullParameterException 参数cell为null
+	 * @throws ExcelIllegalArgumentException cell不是合并单元格
 	 */
-	public String getCellValueOfMergedRegion(Cell cell) throws IllegalArgumentException{  
-		try {
-			int result = isCellInMergedRegion(cell);
-			if (result == 2) { //单元格在合并区域内部
-				int sheetMergeCount = sheet.getNumMergedRegions();
-				int rowIndex = cell.getRowIndex();
-				int columnIndex = cell.getColumnIndex();
-				for (int i = 0; i < sheetMergeCount; i++) {
-					CellRangeAddress ca = sheet.getMergedRegion(i);
-					int firstColumn = ca.getFirstColumn();
-					int lastColumn = ca.getLastColumn();
-					int firstRow = ca.getFirstRow();
-					int lastRow = ca.getLastRow();
-					
-					if (rowIndex >= firstRow && rowIndex <= lastRow) {
-						if (columnIndex >= firstColumn && columnIndex <= lastColumn) { //确定区域位置
-							Row fRow = sheet.getRow(firstRow);
-							Cell fCell = fRow.getCell(firstColumn);
-							return getCellValue(fCell); //返回该区域的第一个单元格的值
-						}
+	public static String getCellValueOfMergedRegion(Sheet sheet,Cell cell) throws ExcelNullParameterException,ExcelIllegalArgumentException{  
+		if(cell == null){
+			throw new ExcelNullParameterException();
+		}
+		
+		int result = isCellInMergedRegion(sheet,cell);
+		if (result == 2) { // 单元格在合并区域内部
+			int sheetMergeCount = sheet.getNumMergedRegions();
+			int rowIndex = cell.getRowIndex();
+			int columnIndex = cell.getColumnIndex();
+			for (int i = 0; i < sheetMergeCount; i++) {
+				CellRangeAddress ca = sheet.getMergedRegion(i);
+				int firstColumn = ca.getFirstColumn();
+				int lastColumn = ca.getLastColumn();
+				int firstRow = ca.getFirstRow();
+				int lastRow = ca.getLastRow();
+
+				if (rowIndex >= firstRow && rowIndex <= lastRow) {
+					if (columnIndex >= firstColumn && columnIndex <= lastColumn) { // 确定区域位置
+						Row fRow = sheet.getRow(firstRow);
+						Cell fCell = fRow.getCell(firstColumn);
+						return getCellValue(fCell); // 返回该区域的第一个单元格的值
 					}
 				}
-				return "";
-			}else if (result == 1) { //单元格为合并区域的第一个单元
-				return getCellValue(cell); //直接返回该单元格的值
-			}else{
-				throw new IllegalArgumentException("指定单元格不是合并单元格");
-			}   
-		} catch (IllegalArgumentException e) {
-			throw e;
+			}
+			return "";
+		} else if (result == 1) { // 单元格为合并区域的第一个单元
+			return getCellValue(cell); // 直接返回该单元格的值
+		} else {
+			throw new ExcelIllegalArgumentException();
 		}
+		
 	}    
 	
 	/**
@@ -545,20 +504,20 @@ public class SheetReadUtil {
 	* @param sheet   
 	* @return  有合并单元格返回true否则返回false
 	*/  
-	public boolean hasMerged() {  
+	public static boolean hasMerged(Sheet sheet) {  
 	     return sheet.getNumMergedRegions() > 0 ? true : false;  
 	} 
 	
 	/**
 	 * 判断指定的单元格是否是合并单元格  
 	 * @param cell 指定单元格
-	 * @return 1(单元格是合并区域的一个单元)、2(合并区域内部的单元)、-1(不是合并区域内的单元)
-	 * @throws IllegalArgumentException 参数为null
+	 * @return 1(单元格是合并区域的第一个单元)、2(合并区域内部的单元)、-1(不是合并区域内的单元)
+	 * @throws ExcelNullParameterException 参数为null
 	 */
-	public int isCellInMergedRegion(Cell cell) throws IllegalArgumentException{
-		if (hasMerged()) {
+	public static int isCellInMergedRegion(Sheet sheet,Cell cell) throws ExcelNullParameterException{
+		if (hasMerged(sheet)) {
 			if(cell == null){
-				throw new IllegalArgumentException("参数为null");
+				throw new ExcelNullParameterException();
 			}
 			int sheetMergeCount = sheet.getNumMergedRegions();
 			int rowIndex = cell.getRowIndex();
@@ -588,13 +547,13 @@ public class SheetReadUtil {
 	 * 判断指定的单元格是否是合并单元格  
 	 * @param rowIndex 单元格行下标
 	 * @param columnIndex 单元格列下标
-	 * @return 1(单元格是合并区域的一个单元)、2(合并区域内部的单元)、-1(不是合并区域内的单元)
-	 * @throws IndexOutOfBoundsException 参数小于零
+	 * @return 1(单元格是合并区域的第一个单元)、2(合并区域内部的单元)、-1(不是合并区域内的单元)
+	 * @throws ExcelIndexOutOfBoundsException 参数小于零
 	 */
-	public int isCellInMergedRegion(int rowIndex,int columnIndex) throws IndexOutOfBoundsException{
-		if (hasMerged()) {
+	public static int isCellInMergedRegion(Sheet sheet,int rowIndex,int columnIndex) throws ExcelIndexOutOfBoundsException{
+		if (hasMerged(sheet)) {
 			if(rowIndex <0 || columnIndex <0){
-				throw new IndexOutOfBoundsException("参数小于零");
+				throw new ExcelIndexOutOfBoundsException();
 			}
 			int sheetMergeCount = sheet.getNumMergedRegions();
 			for (int i = 0; i < sheetMergeCount; i++) {
@@ -618,23 +577,42 @@ public class SheetReadUtil {
 	}	
 	
 	/**
+	 * 按类型返回公式计算值
+	 * @param cellValue 
+	 * @return 数值或文本类型返回具体值，其他返回""。
+	 */
+	private static String getFormulaValue(CellValue cellValue) {
+        String value = "";
+        switch (cellValue.getCellTypeEnum()) {
+        case STRING:
+            value = cellValue.getStringValue();
+            break;
+        case NUMERIC:
+            value = String.valueOf(cellValue.getNumberValue());
+            break;
+        default:
+            break;
+        }
+        return value;
+    }
+	
+	/**
 	 * 判断数据长度、起始下标和读取长度参数是否越界
 	 * @param count 数据总长度,不能小于1
 	 * @param startIndex 起始下标不能小于零或大于最大值
 	 * @param length 读取的长度,不能小于0
-	 * @return 返回要读取的最后一个下标值(如果下标越界,则返回最大下标值)
-	 * <br>如果参数越界抛出异常
-	 * @throws IndexOutOfBoundsException 参数错误
+	 * @return 如果参数越界抛出异常,否则返回要读取的最后一个下标值(如果读取长度大于总长度,则返回最大下标值)
+	 * @throws ExcelIndexOutOfBoundsException 参数越界错误
 	 */
-	protected int isIndexOutOfBounds(int count,int startIndex,int length) throws IndexOutOfBoundsException{
-		if(count<1){
-			throw new IndexOutOfBoundsException("数据长度小于1");
+	protected int isIndexOutOfBounds(int count,int startIndex,int length) throws ExcelIndexOutOfBoundsException{
+		if(count<1){ //数据长度小于1
+			throw new ExcelIndexOutOfBoundsException();
 		}
-		if(length<0){
-        	throw new IndexOutOfBoundsException("读取长度小于零");
+		if(length<0){//读取长度小于零
+			throw new ExcelIndexOutOfBoundsException();
         }
-        if(startIndex > count -1 || startIndex < 0){
-        	throw new IndexOutOfBoundsException("开始下标大于最大的下标值或小于零");
+        if(startIndex > count -1 || startIndex < 0){//开始下标大于最大的下标值或小于零
+        	throw new ExcelIndexOutOfBoundsException();
         }
         //要读取的最后一个下标,如果下标越界，则读取至最后一个值
         int endIndex = startIndex + length - 1;
@@ -642,6 +620,5 @@ public class SheetReadUtil {
 			endIndex = count - 1;
         return endIndex;
 	}
-	
 	
 }
