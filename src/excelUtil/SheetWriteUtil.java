@@ -211,13 +211,13 @@ public class SheetWriteUtil {
 			Date dateStr = null;
 			//Value¸ñÊ½Îª((yyyy-MM-dd,yyyy-MM,MM-dd))
 			int length = value.length();
-			if(length >= 8 || length <= 10){
+			if(length >= 8 && length <= 10){
 				simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 			 	formatNum = dataFormat.getFormat("yyyy-MM-dd");
 			}else if (length == 6 || length == 7) {
 				simpleDateFormat = new SimpleDateFormat("yyyy-MM");
 				formatNum = dataFormat.getFormat("yyyy-MM");
-			}else if(length >= 3 || length <= 5){
+			}else if(length >= 3 && length <= 5){
 				simpleDateFormat = new SimpleDateFormat("MM-dd");
 				formatNum = dataFormat.getFormat("MM-dd");
 			}else{

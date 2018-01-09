@@ -23,6 +23,7 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
 import bean.MyCell;
+import bean.MyRow;
 import excelUtil.CellTypeUtil.TypeEnum;
 import exception.ExcelFileOpenException;
 import exception.ExcelIllegalArgumentException;
@@ -35,20 +36,27 @@ import exception.ExcelNoTitleException;
 */
 
 /**
- *
+ *读sheet表的工具,可获取行、单元格等
  */
 public class SheetReadXMLUtil {
 	
-	private InputSource source;
-	private XMLReader xmlReader;
-	private InputStream sheetInputStream;
-	private MyXSSFSheetHandler handler;
+	protected InputSource source;
+	protected XMLReader xmlReader;
+	protected InputStream sheetInputStream;
+	protected MyXSSFSheetHandler handler;
 	
 	/**
 	 * 自选标题(Integer为标题的列下标,String为标题内容)
 	 */
-	private HashMap<Integer, MyCell> title;
+	protected HashMap<Integer, MyCell> title;
 	
+	/**
+	 * （从ExcelReadXMLUtil获取实例）
+	 * @param stylesTable
+	 * @param stringsTable
+	 * @param sheetInputStream
+	 * @throws ExcelFileOpenException
+	 */
 	public SheetReadXMLUtil(StylesTable stylesTable,  
             ReadOnlySharedStringsTable stringsTable, InputStream sheetInputStream) throws ExcelFileOpenException{
 		this.sheetInputStream = sheetInputStream;
@@ -116,8 +124,14 @@ public class SheetReadXMLUtil {
 	 * 返回读取的所有行
 	 * @return
 	 */
-	public ArrayList<HashMap<Integer, MyCell>> getRowsList(){
-		return handler.getRowsList();
+	public ArrayList<MyRow> getRowsList(){
+		ArrayList<MyRow> list = new ArrayList<>();
+		MyRow row = null;
+		for(HashMap<Integer, MyCell> obj:handler.getRowsList()){
+			row = new MyRow(obj);
+			list.add(row);
+		}
+		return list;
 	}
 	
 	/**
@@ -156,8 +170,8 @@ public class SheetReadXMLUtil {
 		}
 	}
 	
-	public HashMap<Integer, MyCell> getTitle(){
-		return title;
+	public MyRow getTitle(){
+		return new MyRow(title);
 	}
 	
 	/**
@@ -185,6 +199,9 @@ public class SheetReadXMLUtil {
 	}
 	
 	
+	/**
+	 *以XML形式解析Excel文件
+	 */
 	private class MyXSSFSheetHandler extends DefaultHandler {  
 		  
         private StylesTable stylesTable;  
@@ -211,7 +228,7 @@ public class SheetReadXMLUtil {
             this.oneRow = new HashMap<>();
             
             lastRowIndex = -1;
-            rowLimit = 999;//1000
+            rowLimit = 2999;//3000
             colLimit = 99;//100
         }  
   
@@ -326,25 +343,53 @@ public class SheetReadXMLUtil {
 					}
 					break;
 				case FORMULA:
-					valueStr = formatter.formatRawCellContents(Double.parseDouble(value.toString()),
-							currentCell.formatIndex, currentCell.formatString);
+					try {
+						valueStr = formatter.formatRawCellContents(Double.parseDouble(value.toString()),
+								currentCell.formatIndex, currentCell.formatString);
+					} catch (NumberFormatException e) {
+						valueStr = value.toString();
+					}
 					break;
 				case NUMERIC:
 					String num = value.toString();
 					// 判断是否是日期格式
 					if (HSSFDateUtil.isADateFormat(currentCell.formatIndex, currentCell.formatString)) {
-						Double d = Double.parseDouble(num);
-						currentCell.type = TypeEnum.DATE_NUM;
-						valueStr = CellTypeUtil.getFormatDate(d);
+						try {
+							Double d = Double.parseDouble(num);
+							valueStr = CellTypeUtil.getFormatDate(d);
+							currentCell.type = TypeEnum.DATE_NUM;
+						} catch (NumberFormatException e) {
+							valueStr = num;
+						} catch (NullPointerException e) {
+							valueStr = num;
+						}
 					}else{
-						valueStr = num;
+						if (currentCell.formatIndex == 31 || currentCell.formatIndex == 57 || 
+								currentCell.formatIndex == 58 || currentCell.formatIndex == 14 ||
+								currentCell.formatIndex ==179) {// 自定义日期格式
+							/**
+							 * Excel中自定义日期类型 (yyyy/m/d) format:14 (yyyy年MM月dd日) format:31
+							 * (yyyy年MM月) format:57 (MM-dd或MM月dd日) format:58 其他暂不确定
+							 */
+							try {
+								Double d = Double.parseDouble(num);
+								valueStr = CellTypeUtil.getFormatDate(d);
+								currentCell.type = TypeEnum.DATE_NUM;
+							} catch (NumberFormatException e) {
+								valueStr = num;
+							} catch (NullPointerException e) {
+								valueStr = num;
+							}
+						}else{
+							valueStr = num;
+						}
 					}
 					break;
 				default:
 					valueStr = "";
 					break;
 				}
-                currentCell.value = valueStr;
+                currentCell.value = valueStr.trim();
             } 
             else if (name.equals("f")) {
             	if(currentCell == null || currentCell.colIndex > colLimit){

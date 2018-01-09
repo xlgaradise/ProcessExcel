@@ -9,7 +9,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-
+import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellValue;
 import org.apache.poi.ss.usermodel.DateUtil;
@@ -52,7 +52,7 @@ public class SheetReadUtil {
 	
 
 	/**
-	 * 创建读sheet的工具
+	 * 创建读sheet的工具（从ExcelReadUtil获取实例）
 	 * @param sheet 将要操作的sheet实例,从ExcelReadUtil获取
 	 * @throws ExcelNullParameterException 参数为null
 	 */
@@ -491,10 +491,14 @@ public class SheetReadUtil {
 	 * 强制将Numeric类型的值转换为日期
 	 * @param numeric numeric格式的单元格数值
 	 * @return yyyy-MM-dd格式的日期
+	 * @throws NullPointerException 日期强转出错
 	 */
-	public static String changeNumericToDate(double numeric){
+	public static String changeNumericToDate(double numeric) throws NullPointerException{
 		String string = "";
 		Date date = DateUtil.getJavaDate(numeric);
+		if(date == null){
+			date = HSSFDateUtil.getJavaDate(numeric);
+		}
 		string = new SimpleDateFormat("yyyy-MM-dd").format(date);
 		return string;
 	}

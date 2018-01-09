@@ -25,18 +25,19 @@ public class ExcelModifyUtil {
 	
 	/*%%%%%%%%-------字段部分 结束----------%%%%%%%%%*/
 	
-	
+
 	/**
 	 * 创建Excel文件修改工具
-	 * @param excelReadUtil
+	 * @param workbook
+	 * @param filePath
 	 * @throws ExcelNullParameterException 参数为null
 	 */
-	public ExcelModifyUtil(ExcelReadUtil excelReadUtil) throws ExcelNullParameterException{
-		if(excelReadUtil == null){
+	public ExcelModifyUtil(Workbook workbook,String filePath) throws ExcelNullParameterException{
+		if(workbook == null || filePath == null){
 			throw new ExcelNullParameterException();
 		}
-		this.workbook = excelReadUtil.getWorkBook();
-		this.path = excelReadUtil.getFilePath();
+		this.workbook = workbook;
+		this.path = filePath;
 	}
 	
 	public Workbook getWorkBook(){
@@ -81,6 +82,24 @@ public class ExcelModifyUtil {
 	 */
 	public int getSheetIndex(Sheet sheet){
 		return this.workbook.getSheetIndex(sheet);
+	}
+	
+	/**
+	 * 获取指定下标的sheet
+	 * @param sheetIndex
+	 * @return
+	 */
+	public Sheet getSheetByIndex(int sheetIndex){
+		return workbook.getSheetAt(sheetIndex);
+	}
+	
+	/**
+	 * 获取指定名称的sheet
+	 * @param sheetName
+	 * @return
+	 */
+	public Sheet getSheetByName(String sheetName){
+		return workbook.getSheet(sheetName);
 	}
 	
 	/**

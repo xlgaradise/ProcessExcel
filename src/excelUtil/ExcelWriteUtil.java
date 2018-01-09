@@ -42,7 +42,7 @@ public class ExcelWriteUtil {
 	/**
 	 * 创建写Excel工具
 	 * @param directoryPath 文件输出所在目录路径
-	 * @param fileName 文件名
+	 * @param fileName 文件名(不要后缀)
 	 * @throws ExcelFileNotFoundException 路径无效或不是一个目录
 	 * @throws ExcelIllegalArgumentException 文件名为空
 	 * @throws ExcelNullParameterException directoryPath参数为null

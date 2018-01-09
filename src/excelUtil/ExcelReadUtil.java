@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
@@ -53,10 +52,6 @@ public class ExcelReadUtil {
 	 */
 	protected FormulaEvaluator evaluator = null;
 	
-	/**
-	 * 最近一次读取的sheet列表
-	 */
-	protected ArrayList<Sheet> sheetList = null; 	
 	
 	//%%%%%%%%-------字段部分 结束----------%%%%%%%%%
 	
@@ -122,11 +117,67 @@ public class ExcelReadUtil {
 	}
 	
 	/**
-	 * 获取读取的sheet列表
-	 * @return sheet列表
+	 * 获取文件中sheet表的数量
+	 * @return
 	 */
-	public ArrayList<Sheet> getSheetList() {
-		return sheetList;
+	public int getSheetSize(){
+		return this.workbook.getNumberOfSheets();
+	}
+	
+	/**
+	 * 读取第一个sheet
+	 */
+	public SheetReadUtil readFirstSheet(){
+		try {
+			Sheet sheet = workbook.getSheetAt(0);
+			return new SheetReadUtil(sheet);
+		} catch (ExcelNullParameterException e) {
+			return null;
+		}
+	}
+	
+	/**
+	 * 读取下标为Index的Sheet
+	 * @param index sheet的下标值
+	 * @throws ExcelIndexOutOfBoundsException 参数小于0或大于sheet的总数量
+	 */
+	public SheetReadUtil readSheetByIndex(int index) throws ExcelIndexOutOfBoundsException{
+        try {
+        	Sheet sheet = workbook.getSheetAt(index);
+			return new SheetReadUtil(sheet);
+		} catch (IllegalArgumentException | ExcelNullParameterException e) {
+			throw new ExcelIndexOutOfBoundsException();
+		}
+	}
+	
+	/**
+	 * 通过名称读取sheet
+	 * @param name sheet的名称
+	 * @throws ExcelIllegalArgumentException 指定名称sheet不存在
+	 */
+	public SheetReadUtil readSheetByName(String name) throws ExcelIllegalArgumentException{
+		Sheet sheet = workbook.getSheet(name);
+		if(sheet != null){
+			try {
+				return new SheetReadUtil(sheet);
+			} catch (ExcelNullParameterException e) {
+				return null;
+			}
+		}
+		else
+			throw new ExcelIllegalArgumentException();
+	}
+	
+	/**
+	 * 关闭读取工具
+	 * @throws IOException
+	 */
+	public void close() throws IOException{
+		try {
+			this.workbook.close();
+		} catch (IOException e) {
+			throw e;
+		}
 	}
 	
 	/**
@@ -152,119 +203,6 @@ public class ExcelReadUtil {
 		return filePath.substring(filePath.lastIndexOf("\\")+1, filePath.length());
 	}
 	
-	/**
-	 * 读取第一个sheet
-	 */
-	public void readFirstSheet(){
-		try {
-			this.sheetList = getSheetList(0, 1);
-		} catch (ExcelIndexOutOfBoundsException e) {
-		}
-	}
-	
-	/**
-	 * 读取下标为Index的Sheet
-	 * @param index sheet的下标值
-	 * @throws ExcelIndexOutOfBoundsException 参数越界错误
-	 */
-	public void readSheetByIndex(int index) throws ExcelIndexOutOfBoundsException{
-		this.sheetList = getSheetList(index, 1);
-	}
-	
-	/**
-	 * 通过名称读取sheet
-	 * @param name sheet的名称
-	 * @throws ExcelIllegalArgumentException 名称错误，无法获取指定sheet
-	 */
-	public void readSheetByName(String name) throws ExcelIllegalArgumentException{
-		Sheet sheet = workbook.getSheet(name);
-		if(sheet != null){
-			sheetList.add(sheet);
-		}
-		else
-			throw new ExcelIllegalArgumentException();
-	}
-	
-	/**
-	 * 读取指定范围的sheet列表
-	 * @param startIndex sheet开始的下标值
-	 * @param length 要读取sheets的长度
-	 * @throws ExcelIndexOutOfBoundsException 参数越界错误
-	 */
-	public void readSheetList(int startIndex,int length) throws ExcelIndexOutOfBoundsException{
-		this.sheetList = getSheetList(startIndex, length);
-	}
-	
-	/**
-	 * 读取所有的sheet
-	 */
-	public void readAllSheet(){
-		int sheetCount = workbook.getNumberOfSheets();
-        Sheet sheet = null;
-        for(int i=0;i<sheetCount;i++){
-        	sheet = workbook.getSheetAt(i);
-        	sheetList.add(sheet);
-        }
-	}
-	
-	/**
-	 * 关闭读取工具
-	 * @throws IOException
-	 */
-	public void close() throws IOException{
-		try {
-			this.workbook.close();
-		} catch (IOException e) {
-			throw e;
-		}
-	}
-	
-	/**
-	 * 获取需要的sheet列表
-	 * @param startIndex sheet开始的下标值
-	 * @param length 要读取sheets的长度,如果长度过长则读取至数据结尾
-	 * @return Sheet 列表
-	 * @throws ExcelIndexOutOfBoundsException 参数错误
-	 */
-	protected ArrayList<Sheet> getSheetList(int startIndex,int length) throws ExcelIndexOutOfBoundsException{
-		ArrayList<Sheet> sheetList = new ArrayList<>();
-        int sheetCount = workbook.getNumberOfSheets();  //Sheet的数量  
-        int endIndex = 0; 
-        try {
-			endIndex = isIndexOutOfBounds(sheetCount, startIndex, length);
-		} catch (ExcelIndexOutOfBoundsException e) {
-			throw e;
-		}
-        for(int i=startIndex;i<=endIndex;i++){
-        	sheetList.add(workbook.getSheetAt(i));
-        }
-        return sheetList;
-	}
-	
-	/**
-	 * 判断数据长度、起始下标和读取长度参数是否越界
-	 * @param count 数据总长度,不能小于1
-	 * @param startIndex 起始下标不能小于零或大于最大值
-	 * @param length 读取的长度,不能小于0
-	 * @return 如果参数越界抛出异常,否则返回要读取的最后一个下标值(如果读取长度大于总长度,则返回最大下标值)
-	 * @throws ExcelIndexOutOfBoundsException 参数越界错误
-	 */
-	protected int isIndexOutOfBounds(int count,int startIndex,int length) throws ExcelIndexOutOfBoundsException{
-		if(count<1){ //数据长度小于1
-			throw new ExcelIndexOutOfBoundsException();
-		}
-		if(length<0){//读取长度小于零
-			throw new ExcelIndexOutOfBoundsException();
-        }
-        if(startIndex > count -1 || startIndex < 0){//开始下标大于最大的下标值或小于零
-        	throw new ExcelIndexOutOfBoundsException();
-        }
-        //要读取的最后一个下标,如果下标越界，则读取至最后一个值
-        int endIndex = startIndex + length - 1;
-		if (endIndex >= count)
-			endIndex = count - 1;
-        return endIndex;
-	}
 }
 	
 	

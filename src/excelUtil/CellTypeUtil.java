@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DateUtil;
@@ -138,7 +139,14 @@ public class CellTypeUtil {
 		case NUMERIC:
 			short format = cell.getCellStyle().getDataFormat();
 			if (DateUtil.isCellDateFormatted(cell)) { // 日期格式
-				return TypeEnum.DATE_NUM;
+				double d = cell.getNumericCellValue();
+				try {
+					getFormatDate(d);
+					return TypeEnum.DATE_NUM;
+				} catch (NullPointerException e) {
+					return TypeEnum.NUMERIC;
+				}
+				
 			} else if (format == 31 || format == 57 || format == 58 || format == 14) {// 自定义日期格式
 				/**
 				 * Excel中自定义日期类型 (yyyy/m/d) format:14 (yyyy年MM月dd日) format:31
@@ -270,9 +278,13 @@ public class CellTypeUtil {
 	 * 获取标准化日期格式
 	 * @param dateValue
 	 * @return 日期类型格式(yyyy-MM-dd)
+	 * @throws NullPointerException 日期解析错误
 	 */
-	public static String getFormatDate(double dateValue){
+	public static String getFormatDate(double dateValue) throws NullPointerException{
 		Date date = DateUtil.getJavaDate(dateValue);
+		if(date == null){
+			date = HSSFDateUtil.getJavaDate(dateValue);
+		}
 		String string = new SimpleDateFormat("yyyy-MM-dd").format(date);
 		return string;
 	}

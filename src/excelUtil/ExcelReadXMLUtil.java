@@ -177,10 +177,10 @@ public class ExcelReadXMLUtil {
 	 * 检查文件是否为07版Excel文件
 	 * @param filePath 文件路径
 	 * @return 如果文件为xlsx格式则返回true,否则false
-	 * @throws ExcelNullParameterException 文件路径为null
+	 * @throws ExcelNullParameterException 文件路径为null或“”
 	 */
 	public static boolean is07ExcelFile(String filePath) throws ExcelNullParameterException{
-		if(filePath == null){
+		if(filePath == null || filePath.equals("")){
 			throw new ExcelNullParameterException();
 		}
 		String ext = filePath.substring(filePath.lastIndexOf("."));

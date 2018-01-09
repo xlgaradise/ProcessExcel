@@ -42,7 +42,7 @@ public class SheetModifyUtil {
 	/**
 	 * 创建写sheet的工具
 	 * 
-	 * @param sheet 将要写入数据的sheet,从ExcelReadUtil获取
+	 * @param sheet 将要写入数据的sheet,从ExcelModifyUtil获取
 	 * @throws ExcelNullParameterException sheet为null
 	 */
 	public SheetModifyUtil(Sheet sheet) throws ExcelNullParameterException {
@@ -183,7 +183,7 @@ public class SheetModifyUtil {
 				cellStyleUtil = new CellStyleUtil(workbook);
 			} catch (ExcelNullParameterException e) {
 			}
-			cellStyle = cellStyleUtil.getCommonCellStyle_alignCenter();
+			cellStyle = cellStyleUtil.getCommonCellStyle();
 		}
 		switch (cellType) {
 		case STRING:
@@ -224,13 +224,13 @@ public class SheetModifyUtil {
 			Date dateStr = null;
 			//Value格式为((yyyy-MM-dd,yyyy-MM,MM-dd))
 			int length = value.length();
-			if(length >= 8 || length <= 10){
+			if(length >= 8 && length <= 10){
 				simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 			 	formatNum = dataFormat.getFormat("yyyy-MM-dd");
 			}else if (length == 6 || length == 7) {
 				simpleDateFormat = new SimpleDateFormat("yyyy-MM");
 				formatNum = dataFormat.getFormat("yyyy-MM");
-			}else if(length >= 3 || length <= 5){
+			}else if(length >= 3 && length <= 5){
 				simpleDateFormat = new SimpleDateFormat("MM-dd");
 				formatNum = dataFormat.getFormat("MM-dd");
 			}else{
@@ -277,6 +277,13 @@ public class SheetModifyUtil {
 		}
 	}
 	
+	/**
+	 * 设置某列自动调整列宽
+	 * @param columnIndex 要调整列宽的下标
+	 */
+	public void setAutoSizeColumn(int columnIndex){
+		sheet.autoSizeColumn(columnIndex);
+	}
 	
 	/**
 	 * 设置指定行的前景色
