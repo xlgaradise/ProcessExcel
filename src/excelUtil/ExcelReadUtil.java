@@ -190,7 +190,12 @@ public class ExcelReadUtil {
 		if(filePath == null){
 			throw new ExcelNullParameterException();
 		}
-		String ext = filePath.substring(filePath.lastIndexOf("."));
+		String ext = "";
+		try {
+			ext = filePath.substring(filePath.lastIndexOf("."));
+		} catch (IndexOutOfBoundsException e) {
+			
+		}
 		return ext.equals(".xlsx") || ext.equals(".xls") ? true : false;
 	}
 	

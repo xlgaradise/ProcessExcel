@@ -35,4 +35,18 @@ public class MyRow {
 	public int getValidCellSize(){
 		return row.size();
 	}
+	
+	public void print(int colSize){
+		String rowStr = "{";
+		String message = "";
+		for(int i=0;i<colSize;i++){
+			MyCell cell = this.row.get(i);
+			if(cell == null) 
+				message += "[] ";
+			else
+				message += "["+cell.value+"] ";
+		}
+		rowStr += message +"}";
+		System.out.println(rowStr);
+	}
 }

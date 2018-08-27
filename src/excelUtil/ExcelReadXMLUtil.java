@@ -157,10 +157,10 @@ public class ExcelReadXMLUtil {
 			throw new ExcelFileOpenException(e);
 		}  
 		SheetReadXMLUtil sheetReadBigDataUtil = null;
-        while (iter.hasNext()) {  
+        while (iter.hasNext()) {
+        	InputStream stream = iter.next();
         	String name = iter.getSheetName();
         	if(name.equals(sheetName)){
-				InputStream stream = iter.next();
 				sheetReadBigDataUtil = new SheetReadXMLUtil(stylesTable, sharedStringsTable, stream);
 				break;
         	}
@@ -183,7 +183,12 @@ public class ExcelReadXMLUtil {
 		if(filePath == null || filePath.equals("")){
 			throw new ExcelNullParameterException();
 		}
-		String ext = filePath.substring(filePath.lastIndexOf("."));
+		String ext = "";
+		try {
+			ext = filePath.substring(filePath.lastIndexOf("."));
+		} catch (IndexOutOfBoundsException e) {
+			
+		}
 		return ext.equals(".xlsx") ? true : false;
 	}
 }
